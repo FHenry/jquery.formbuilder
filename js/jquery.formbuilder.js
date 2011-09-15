@@ -22,6 +22,7 @@
 				add_new_field		: "Add New Field...",
 				text				: "Text Field",
 				title				: "Title",
+				select_date			: "Date",
 				comment				: "Comment",
 				paragraph			: "Paragraph",
 				checkboxes			: "Checkboxes",
@@ -82,6 +83,7 @@
 					select += '<option value="checkbox">' + opts.messages.checkboxes + '</option>';
 					select += '<option value="radio">' + opts.messages.radio + '</option>';
 					select += '<option value="select">' + opts.messages.select + '</option>';
+					select += '<option value="select_date">' + opts.messages.select_date + '</option>';
 					select += '<option value="comment">' + opts.messages.comment + '</option>';
 					// Build the control box and search button content
 					box_content = '<select id="' + box_id + '" class="frmb-control">' + select + '</select>';
@@ -206,6 +208,9 @@
 					case 'select':
 						appendSelectList(values, options, required);
 						break;
+					case 'select_date':
+						appendSelectDate(values, required);
+						break;
 					case 'comment':
 						appendComment(values);
 						break;
@@ -224,6 +229,19 @@
 					help = '';
 					required = 'disabled';
 					appendFieldLi(opts.messages.comment_field, field, required, help, code);
+				};
+			// single line input type="text"
+			var appendSelectDate = function (values, required) {
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
+					help = '';
+					appendFieldLi(opts.messages.select_date, field, required, help, code);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -567,6 +585,16 @@
 						serialStr += opts.prepend + '[' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+								}
+								else {
+									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+								}
+							});
+							break;
+						case 'select_date':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());

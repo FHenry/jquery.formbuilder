@@ -370,7 +370,7 @@ class Formbuilder {
 
 				$field['required'] = $field['required'] == 'checked' ? true : false;
 
-				if($field['cssClass'] == 'input_text' || $field['cssClass'] == 'textarea'){
+				if($field['cssClass'] == 'input_text' || $field['cssClass'] == 'textarea' || $field['cssClass'] == 'select_date'){
 
 					$val = $this->getPostValue( $field['code'] );
 
@@ -464,6 +464,9 @@ class Formbuilder {
 				case 'select':
 					return $this->loadSelectBox($field, $view_type, $parameters);
 					break;
+				case 'select_date':
+					return $this->loadSelectDate($field, $view_type, $parameters);
+					break;
 				case 'comment':
 					return $this->loadComment($field, $view_type, $parameters);
 					break;
@@ -495,6 +498,77 @@ class Formbuilder {
 				$$key=$value;
 			}
 		}
+		
+		if ($view_type == 'view')
+		{
+			$html .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
+			$html .= $field_value;
+			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'table')
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			
+			$html .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+									$field['code'],
+									$field['code'],
+									$field_value);
+			$html .= '</td></tr>' . "\n";
+		}
+		else
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
+			
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
+			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+									$field['code'],
+									$field['code'],
+									$field_value);
+			$html .= '</li>' . "\n";
+		}
+
+		return $html;
+	}
+	
+	/**
+	 * Returns html for an input select date
+	 * 
+	 * @param array $field Field values from database
+	 * @access protected
+	 * @return string
+	 */
+	protected function loadSelectDate($field, $view_type = false, $parameters = false){
+		
+		global $conf, $langs;
+
+		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
+
+		$html = '';
+		
+		if (is_array($parameters) && ! empty($parameters))
+		{
+			foreach($parameters as $key=>$value)
+			{
+				$$key=$value;
+			}
+		}
+		
+		$html.= '<script>';
+		$html.= '$(function() {
+					$( "#'.$field['code'].'" ).datepicker({
+						showOn: "button",
+						buttonImage: "'.DOL_URL_ROOT.'/theme/'.$conf->theme.'/img/calendar.png",
+						buttonImageOnly: true,
+						monthNames: tradMonths,
+						monthNamesShort: tradMonthsMin,
+						dayNames: tradDays,
+						dayNamesMin: tradDaysMin,
+						dateFormat: "'.$langs->trans("FormatDateShortJQuery").'"
+					});
+				});';
+		$html.= '</script>';
 		
 		if ($view_type == 'view')
 		{
