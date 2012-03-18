@@ -317,12 +317,12 @@ class Formbuilder {
 	 */
 	public function generate_html($form_action = false, $view_type = false, $parameters = false){
 
-		$html = '';
+		$form = '';
 		
 		if (! $form_action)
 		{
 			foreach($this->_structure as $field) {
-				$html .= $this->loadField($field, $view_type, $parameters);
+				$form .= $this->loadField($field, $view_type, $parameters);
 			}
 		}
 		else
@@ -331,21 +331,21 @@ class Formbuilder {
 	
 			if(is_array($this->_structure)){
 		
-				$html .= '<form class="frm-bldr" method="post" action="'.$form_action.'">' . "\n";
-				$html .= '<ol>'."\n";
+				$form .= '<form class="frm-bldr" method="post" action="'.$form_action.'">' . "\n";
+				$form .= '<ol>'."\n";
 	
 				foreach($this->_structure as $field){
-					$html .= $this->loadField($field);
+					$form .= $this->loadField($field);
 				}
 				
-				$html .= '<li class="btn-submit"><input type="submit" name="submit" value="Submit" /></li>' . "\n";
-				$html .=  '</ol>' . "\n";
-				$html .=  '</form>' . "\n";
+				$form .= '<li class="btn-submit"><input type="submit" name="submit" value="Submit" /></li>' . "\n";
+				$form .=  '</ol>' . "\n";
+				$form .=  '</form>' . "\n";
 				
 			}
 		}
 
-		return $html;
+		return $form;
 
 	}
 
@@ -489,7 +489,7 @@ class Formbuilder {
 
 		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -501,35 +501,35 @@ class Formbuilder {
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
-			$html .= $field_value;
-			$html .= '</td></tr>' . "\n";
+			$form .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
+			$form .= $field_value;
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
+			$form .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 			
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
-			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
-			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
+			$form .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</li>' . "\n";
+			$form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 	}
 	
 	/**
@@ -545,7 +545,7 @@ class Formbuilder {
 
 		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -555,8 +555,8 @@ class Formbuilder {
 			}
 		}
 		
-		$html.= '<script>';
-		$html.= '$(function() {
+		$form.= '<script>';
+		$form.= '$(function() {
 					$( "#'.$field['code'].'" ).datepicker({
 						showOn: "button",
 						buttonImage: "'.DOL_URL_ROOT.'/theme/'.$conf->theme.'/img/calendar.png",
@@ -568,39 +568,39 @@ class Formbuilder {
 						dateFormat: "'.$langs->trans("FormatDateShortJQuery").'"
 					});
 				});';
-		$html.= '</script>';
+		$form.= '</script>';
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
-			$html .= $field_value;
-			$html .= '</td></tr>' . "\n";
+			$form .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
+			$form .= $field_value;
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
+			$form .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 			
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
-			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
-			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
+			$form .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</li>' . "\n";
+			$form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 	}
 
 
@@ -615,7 +615,7 @@ class Formbuilder {
 		
 		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 		
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -627,35 +627,35 @@ class Formbuilder {
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
-			$html .= dol_nl2br($field_value);
-			$html .= '</td></tr>' . "\n";
+			$form .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
+			$form .= dol_nl2br($field_value);
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<textarea id="%s" name="%s" rows="5" cols="50">%s</textarea>' . "\n",
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['values'].'</span></td><td'.$colspan.'>';
+			$form .= sprintf('<textarea id="%s" name="%s" rows="5" cols="50">%s</textarea>' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else 
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 			
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
-			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
-			$html .= sprintf('<textarea id="%s" name="%s" rows="5" cols="50">%s</textarea>' . "\n",
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['values']);
+			$form .= sprintf('<textarea id="%s" name="%s" rows="5" cols="50">%s</textarea>' . "\n",
 									$field['code'],
 									$field['code'],
 									$field_value);
-			$html .= '</li>' . "\n";
+			$form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 	}
 
 
@@ -668,7 +668,7 @@ class Formbuilder {
 	 */
 	protected function loadCheckboxGroup($field, $view_type = false, $parameters = false){
 
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -680,7 +680,7 @@ class Formbuilder {
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
+			$form .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
 			
 			if(isset($field['values']) && is_array($field['values'])){
 				$i=0;
@@ -688,28 +688,28 @@ class Formbuilder {
 					
 					// load data value
 					$val = $this->getDataValue($field['code'].'-'.$i);
-					if (! empty($val)) $html .= $this->getDataValue($field['code'].'-'.$i)."<br />";
+					if (! empty($val)) $form .= $this->getDataValue($field['code'].'-'.$i)."<br />";
 					
 					$i++;
 				}
 			}
 			
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
 		}
 		else 
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 			
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 	
 			if(isset($field['title']) && !empty($field['title'])){
-				$html .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
+				$form .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
 			}
 		}
 		
@@ -717,7 +717,7 @@ class Formbuilder {
 		{
 			if(isset($field['values']) && is_array($field['values'])){
 				
-				$html .= sprintf('<span class="multi-row clearfix">') . "\n";
+				$form .= sprintf('<span class="multi-row clearfix">') . "\n";
 				$i=0;
 				foreach($field['values'] as $item){
 	
@@ -732,18 +732,18 @@ class Formbuilder {
 					$checked = $checked ? ' checked="checked"' : '';
 	
 					$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%s-'.$i.'" value="%s"%s /><label for="%s-'.$i.'">%s</label></span>' . "\n";
-					$html .= sprintf($checkbox, $field['code'], $field['code'], $item['value'], $checked, $field['code'], $item['value']);
+					$form .= sprintf($checkbox, $field['code'], $field['code'], $item['value'], $checked, $field['code'], $item['value']);
 					
 					$i++;
 				}
-				$html .= sprintf('</span>') . "\n";
+				$form .= sprintf('</span>') . "\n";
 			}
 			
-			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
-			else $html .= '</li>' . "\n";
+			if ($view_type == 'table') $form .= '</td></tr>' . "\n";
+			else $form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 
 	}
 
@@ -756,7 +756,7 @@ class Formbuilder {
 	 */
 	protected function loadRadioGroup($field, $view_type = false, $parameters = false){
 		
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -768,42 +768,42 @@ class Formbuilder {
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
+			$form .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
 			
 			if(isset($field['values']) && is_array($field['values'])){
 				$i=0;
 				foreach($field['values'] as $item){
 					
 					// load data value
-					$html .= ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : '');
+					$form .= ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : '');
 					
 					$i++;
 				}
 			}
 			
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
 		}
 		else 
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 	
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 	
 			if(isset($field['title']) && !empty($field['title'])){
-				$html .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
+				$form .= sprintf('<span class="false_label">%s</span>' . "\n", $field['title']);
 			}
 		}
 		
 		if ($view_type != 'view')
 		{
 			if(isset($field['values']) && is_array($field['values'])){
-				$html .= sprintf('<span class="multi-row">') . "\n";
+				$form .= sprintf('<span class="multi-row">') . "\n";
 				$i=0;
 				foreach($field['values'] as $item){
 	
@@ -818,21 +818,21 @@ class Formbuilder {
 					$checked = $checked ? ' checked="checked"' : '';
 				
 					$radio 		= '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /><label for="%1$s-'.$i.'">%2$s</label></span>' . "\n";
-					$html .= sprintf($radio,
+					$form .= sprintf($radio,
 											$field['code'],
 											$item['value'],
 											$checked);
 					
 					$i++;
 				}
-				$html .= sprintf('</span>') . "\n";
+				$form .= sprintf('</span>') . "\n";
 			}
 	
-			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
-			else $html .= '</li>' . "\n";
+			if ($view_type == 'table') $form .= '</td></tr>' . "\n";
+			else $form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 
 	}
 
@@ -846,7 +846,7 @@ class Formbuilder {
 	 */
 	protected function loadSelectBox($field, $view_type = false, $parameters = false){
 		
-		$html = '';
+		$form = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -858,26 +858,26 @@ class Formbuilder {
 		
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
+			$form .= '<tr><td>'.$field['title'].'</td><td'.$colspan.'>';
 			
 			if(isset($field['values']) && is_array($field['values'])){
 				$i=0;
 				foreach($field['values'] as $item){
 					
 					// load data value
-					$html .= ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : '');
+					$form .= ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['value'] ? $this->getDataValue($field['code']) : '');
 					
 					$i++;
 				}
 			}
 			
-			$html .= '</td></tr>' . "\n";
+			$form .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			
-			$html .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
+			$form .= '<tr><td><span'.$field['required'].'>'.$field['title'].'</span></td><td'.$colspan.'>';
 		}
 		else 
 		{
@@ -885,10 +885,10 @@ class Formbuilder {
 	
 			
 	
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$form .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
 	
 			if(isset($field['title']) && !empty($field['title'])){
-				$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['title']);
+				$form .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $field['title']);
 			}
 		}
 		
@@ -896,7 +896,7 @@ class Formbuilder {
 		{
 			if(isset($field['values']) && is_array($field['values'])){
 				$multiple = $field['multiple'] == "true" ? ' multiple="multiple"' : '';
-				$html .= sprintf('<select class="flat" name="%s" id="%s"%s>' . "\n", $field['code'], $field['code'], $multiple);
+				$form .= sprintf('<select class="flat" name="%s" id="%s"%s>' . "\n", $field['code'], $field['code'], $multiple);
 	
 				foreach($field['values'] as $item){
 	
@@ -911,18 +911,18 @@ class Formbuilder {
 					$checked = $checked ? ' selected="selected"' : '';
 	
 					$option 	= '<option value="%s"%s>%s</option>' . "\n";
-					$html .= sprintf($option, $item['value'], $checked, $item['value']);
+					$form .= sprintf($option, $item['value'], $checked, $item['value']);
 				}
 	
-				$html .= '</select>' . "\n";
+				$form .= '</select>' . "\n";
 	
 			}
 			
-			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
-			else $html .= '</li>' . "\n";
+			if ($view_type == 'table') $form .= '</td></tr>' . "\n";
+			else $form .= '</li>' . "\n";
 		}
 
-		return $html;
+		return $form;
 
 	}
 	
@@ -935,7 +935,7 @@ class Formbuilder {
 	 */
 	protected function loadComment($field, $view_type = false, $parameters = false){
 		
-		$html = '';
+		$form = '';
 		
 		if ($view_type == 'view')
 		{
@@ -951,14 +951,14 @@ class Formbuilder {
 				}
 			}
 			
-			$html .= '<tr><td>&nbsp;</td><td'.$colspan.'>'.$field['values'].'</td></tr>';
+			$form .= '<tr><td>&nbsp;</td><td'.$colspan.'>'.$field['values'].'</td></tr>';
 		}
 		else
 		{
-			$html .= sprintf('<p>%s</p>', $field['values']) . "\n";
+			$form .= sprintf('<p>%s</p>', $field['values']) . "\n";
 		}
 
-		return $html;
+		return $form;
 
 	}
 
