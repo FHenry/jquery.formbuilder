@@ -16,6 +16,7 @@
 			serialize_prefix: 'frmb',
 			css_ol_sortable_class : 'ol_opt_sortable',
 			code_prefix: 'options_',
+			confirm_delete: 'confirm-delete',
 			use_ui_icon: false,
 			messages: {
 				save				: "Save",
@@ -36,7 +37,9 @@
 				select_options		: "Select Options",
 				add					: "Add",
 				checkbox_group		: "Checkbox Group",
-				remove_message		: "Are you sure you want to remove this element?",
+				remove_message		: "Remove this field",
+				remove_confirm		: "Ok",
+				remove_cancel		: "Cancel",
 				remove				: "Remove",
 				move_message		: "Move this option",
 				move				: "Move",
@@ -467,15 +470,30 @@
 			// handle delete confirmation
 			$('.delete-confirm').live('click', function () {
 				var delete_id = $(this).attr("id").replace(/del_/, '');
-				if (confirm($(this).attr('title'))) {
-					$('#frm-' + delete_id + '-item').animate({
-						opacity: 'hide',
-						height: 'hide',
-						marginBottom: '0px'
-					}, 'slow', function () {
-						$(this).remove();
+				$( "#" + opts.confirm_delete ).dialog({
+					resizable: false,
+					width: 400,
+					modal: true,
+					buttons: [
+					          {
+					        	  text: opts.messages.remove_confirm,
+					        	  click: function() {
+					        		  $( this ).dialog( "close" );
+					        		  $('#frm-' + delete_id + '-item').animate({
+					        			  opacity: 'hide',
+					        			  height: 'hide',
+					        			  marginBottom: '0px'
+					        		  }, 'slow', function () { $(this).remove(); });
+					        	  }
+					          },
+					          {
+					        	  text: opts.messages.remove_cancel,
+					        	  click: function() {
+					        		  $( this ).dialog( "close" );
+					        	  }
+					          }
+					     ]
 					});
-				}
 				return false;
 			});
 			// Attach a callback to add new checkboxes
