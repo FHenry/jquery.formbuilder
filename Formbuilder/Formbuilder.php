@@ -47,6 +47,7 @@ class Formbuilder {
 		// otherwise, store the source
 		if(array_key_exists('form_structure', $form)){
 			$form['form_structure'] = json_decode($form['form_structure'], true);
+			$form['form_data'] = json_decode($form['form_data'], true);
 			$this->_form_array = $form;
 		}
 		else if(array_key_exists('frmb', $form)){
@@ -66,7 +67,11 @@ class Formbuilder {
 	 * @return array
 	 */
 	public function get_encoded_form_array(){
-		return array('form_id'=>$this->_form_array['form_id'],'form_structure'=>json_encode($this->_form_array['form_structure']));
+		return array(
+				'form_id'=>$this->_form_array['form_id'],
+				'form_structure'=>json_encode($this->_form_array['form_structure']),
+				'form_data'=>json_encode($this->_form_array['form_data'])
+				);
 	}
 
 
@@ -228,7 +233,7 @@ class Formbuilder {
 	protected function loadField($field, $view_type = false, $parameters = false){
 
 		if(is_array($field) && isset($field['cssClass'])){
-
+			
 			switch($field['cssClass']){
 
 				case 'input_text':
@@ -323,10 +328,11 @@ class Formbuilder {
 	 */
 	protected function loadSelectDate($field, $view_type = false, $parameters = false){
 		
-		global $conf, $langs;
+		global $db, $conf, $langs;
 
-		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
-
+		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
+		$timestamp = ($this->getDataValue($field['code'].'_timestamp') ? $this->getDataValue($field['code'].'_timestamp') : $this->getPostValue($field['code'].'_timestamp'));
+		
 		$html = '';
 		
 		if (is_array($parameters) && ! empty($parameters))
@@ -343,11 +349,7 @@ class Formbuilder {
 						showOn: "button",
 						buttonImage: "'.DOL_URL_ROOT.'/theme/'.$conf->theme.'/img/calendar.png",
 						buttonImageOnly: true,
-						monthNames: tradMonths,
-						monthNamesShort: tradMonthsMin,
-						dayNames: tradDays,
-						dayNamesMin: tradDaysMin,
-						dateFormat: "'.$langs->trans("FormatDateShortJQuery").'"
+						altField: "#'.$field['code'].'_timestamp"
 					});
 				});';
 		$html.= '</script>';
@@ -355,7 +357,7 @@ class Formbuilder {
 		if ($view_type == 'view')
 		{
 			$html .= '<tr><td>'.$field['values'].'</td><td'.$colspan.'>';
-			$html .= $field_value;
+			$html .= dol_print_date(($timestamp/1000), 'day');
 			$html .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
@@ -366,7 +368,8 @@ class Formbuilder {
 			$html .= sprintf('<input type="text" id="%s" name="%s" value="%s" />' . "\n",
 									$field['code'],
 									$field['code'],
-									$field_value);
+									dol_print_date(($timestamp/1000), 'day'));
+			$html .= '<input type="hidden" id="'.$field['code'].'_timestamp" name="'.$field['code'].'_timestamp" value="'.$timestamp.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
 		}
 		else
@@ -513,7 +516,7 @@ class Formbuilder {
 					// if checked, set html
 					$checked = $checked ? ' checked="checked"' : '';
 	
-					$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%s-'.$i.'" value="%s"%s /><label for="%s-'.$i.'">%s</label></span>' . "\n";
+					$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%s-'.$i.'" value="%s"%s /> <label for="%s-'.$i.'">%s</label></span>' . "\n";
 					$html .= sprintf($checkbox, $field['code'], $field['code'], $item['value'], $checked, $field['code'], $item['value']);
 					
 					$i++;
@@ -599,7 +602,7 @@ class Formbuilder {
 					// if checked, set html
 					$checked = $checked ? ' checked="checked"' : '';
 				
-					$radio = '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /><label for="%1$s-'.$i.'">%2$s</label></span>' . "\n";
+					$radio = '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /> <label for="%1$s-'.$i.'">%2$s</label></span>' . "\n";
 					$html .= sprintf($radio,
 											$field['code'],
 											$item['value'],
@@ -778,8 +781,8 @@ class Formbuilder {
 	 * @return mixed
 	 */
 	protected function getDataValue($key){
-		if (is_array($this->_data) && ! empty($this->_data)) {
-			return array_key_exists($key, $this->_data) ? $this->_data[$key] : false;
+		if (is_array($this->_form_array['form_data']) && ! empty($this->_form_array['form_data'])) {
+			return array_key_exists($key, $this->_form_array['form_data']) ? $this->_form_array['form_data'][$key] : false;
 		}
 	}
 }
