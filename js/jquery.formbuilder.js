@@ -14,6 +14,7 @@
 			load_url: false,
 			control_box_target: false,
 			serialize_prefix: 'frmb',
+			css_ol_sortable_class : 'ol_opt_sortable',
 			code_prefix: 'options_',
 			use_ui_icon: false,
 			messages: {
@@ -37,6 +38,8 @@
 				checkbox_group		: "Checkbox Group",
 				remove_message		: "Are you sure you want to remove this element?",
 				remove				: "Remove",
+				move_message		: "Move this option",
+				move				: "Move",
 				radio_group			: "Radio Group",
 				selections_message	: "Allow Multiple Selections",
 				hide				: "Hide",
@@ -234,6 +237,9 @@
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
+
+					field += '<div><ol class="' + opts.css_ol_sortable_class + '">';
+
 					if (typeof (values) === 'object') {
 						for (i = 0; i < values.length; i++) {
 							field += checkboxFieldHtml(values[i]);
@@ -242,11 +248,16 @@
 					else {
 						field += checkboxFieldHtml('');
 					}
+
+					field += '</ol></div>';
+
 					field += '<div class="add-area"><a href="#" class="add add_ck">' + opts.messages.add + '</a></div>';
 					field += '</div>';
 					field += '</div>';
 					help = '';
 					appendFieldLi(opts.messages.checkbox_group, field, required, help, code);
+					
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
 				};
 			// Checkbox field html, since there may be multiple
 			var checkboxFieldHtml = function (values) {
@@ -256,13 +267,15 @@
 						value = values[0];
 						checked = ( values[1] === 'false' || values[1] === 'undefined' ) ? false : true;
 					}
-					field = '';
+					field = '<li class="none">';
 					field += '<div>';
 					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
-					field += '</div>';
+					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
+					field += '</div></li>';
 					useUiIcon('.remove','ui-icon-trash');
+					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 					return field;
 				};
 			// adds a radio element
@@ -278,6 +291,9 @@
 					field += '<input type="text" name="title" value="' + title + '" /></div>';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
+
+					field += '<div><ol class="' + opts.css_ol_sortable_class + '">';
+
 					if (typeof (values) === 'object') {
 						for (i = 0; i < values.length; i++) {
 							field += radioFieldHtml(values[i], 'frm-' + last_id + '-fld');
@@ -286,11 +302,16 @@
 					else {
 						field += radioFieldHtml('', 'frm-' + last_id + '-fld');
 					}
+
+					field += '</ol></div>';
+
 					field += '<div class="add-area"><a href="#" class="add add_rd">' + opts.messages.add + '</a></div>';
 					field += '</div>';
 					field += '</div>';
 					help = '';
 					appendFieldLi(opts.messages.radio_group, field, required, help, code);
+					
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
 				};
 			// Radio field html, since there may be multiple
 			var radioFieldHtml = function (values, name) {
@@ -305,8 +326,10 @@
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					field += '<input type="text" value="' + value + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
+					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
 					field += '</div>';
 					useUiIcon('.remove','ui-icon-trash');
+					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 					return field;
 				};
 			// adds a select/option element
@@ -327,6 +350,9 @@
 					field += '<div class="fields">';
 					field += '<input type="checkbox" name="multiple"' + (multiple ? 'checked="checked"' : '') + '>';
 					field += '<label class="auto">' + opts.messages.selections_message + '</label>';
+					
+					field += '<div><ol class="' + opts.css_ol_sortable_class + '">';
+					
 					if (typeof (values) === 'object') {
 						for (i = 0; i < values.length; i++) {
 							field += selectFieldHtml(values[i], multiple);
@@ -335,11 +361,16 @@
 					else {
 						field += selectFieldHtml('', multiple);
 					}
+					
+					field += '</ol></div>';
+					
 					field += '<div class="add-area"><a href="#" class="add add_opt">' + opts.messages.add + '</a></div>';
 					field += '</div>';
 					field += '</div>';
 					help = '';
 					appendFieldLi(opts.messages.select, field, required, help, code);
+					
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
 				};
 			// Select field html, since there may be multiple
 			var selectFieldHtml = function (values, multiple) {
@@ -390,6 +421,7 @@
 					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
 					useUiIcon('.add','ui-icon-plus');
 					useUiIcon('.remove','ui-icon-trash');
+					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				};
 			// handle field delete links
 			$('.remove').live('click', function () {
@@ -450,18 +482,21 @@
 			$('.add_ck').live('click', function () {
 				$(this).parent().before(checkboxFieldHtml());
 				useUiIcon('.remove','ui-icon-trash');
+				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
 			});
 			// Attach a callback to add new options
 			$('.add_opt').live('click', function () {
 				$(this).parent().before(selectFieldHtml('', false));
 				useUiIcon('.remove','ui-icon-trash');
+				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
 			});
 			// Attach a callback to add new radio fields
 			$('.add_rd').live('click', function () {
 				$(this).parent().before(radioFieldHtml(false, $(this).parents('.frm-holder').attr('id')));
 				useUiIcon('.remove','ui-icon-trash');
+				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
 			});
 			// Use ui-icon
