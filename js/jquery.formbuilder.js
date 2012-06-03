@@ -13,7 +13,6 @@
 			save_url: false,
 			load_url: false,
 			control_box_target: false,
-			useJson: true, // XML as fallback
 			serialize_prefix: 'frmb',
 			code_prefix: 'options_',
 			use_ui_icon: false,
@@ -49,24 +48,13 @@
 		var frmb_id = 'frmb-' + $('ul[id^=frmb-]').length++;
 		return this.each(function () {
 			var ul_obj = $(this).append('<ul id="' + frmb_id + '" class="frmb"></ul>').find('ul');
-			var field = '';
-			var field_type = '';
-			var last_id = 1;
-			var help;
+			var field = '', field_type = '', last_id = 1, help;
 			// Add a unique class to the current element
 			$(ul_obj).addClass(frmb_id);
 			// load existing form data
 			if (opts.load_url) {
-				$.ajax({
-					type: "GET",
-					url: opts.load_url,
-					success: function (data) {
-						if (opts.useJson) {
-							fromJson(data);
-						} else {
-							fromXml(data);
-						}
-					}
+				$.getJSON(opts.load_url, function(json) {
+					fromJson(json.form_structure);
 				});
 			}
 			// Create form control select box and add into the editor
@@ -112,42 +100,6 @@
 						return false;
 					});
 				}(opts.control_box_target);
-			// XML parser to build the form builder
-			var fromXml = function (xml) {
-					var values = '';
-					var options = false;
-					var required = false;
-					$(xml).find('field').each(function () {
-						// checkbox type
-						if ($(this).attr('type') === 'checkbox') {
-							options = [$(this).attr('title')];
-							values = [];
-							$(this).find('checkbox').each(function () {
-								values.push([$(this).text(), $(this).attr('checked')]);
-							});
-						}
-						// radio type
-						else if ($(this).attr('type') === 'radio') {
-							options = [$(this).attr('title')];
-							values = [];
-							$(this).find('radio').each(function () {
-								values.push([$(this).text(), $(this).attr('checked')]);
-							});
-						}
-						// select type
-						else if ($(this).attr('type') === 'select') {
-							options = [$(this).attr('title'), $(this).attr('multiple')];
-							values = [];
-							$(this).find('option').each(function () {
-								values.push([$(this).text(), $(this).attr('checked')]);
-							});
-						}
-						else {
-							values = $(this).text();
-						}
-						appendNewField($(this).attr('type'), values, options, $(this).attr('required'));
-					});
-				};
 			// Json parser to build the form builder
 			var fromJson = function (json) {
 					var values = '';
@@ -459,8 +411,8 @@
 					var message = $(this);
 				}
 				if (message.html() === opts.messages.hide) {
-					$(this).removeClass('open').addClass('closed');
-					useUiIcon('.toggle-form','ui-icon-triangle-1-s');
+					$(this).removeClass('open').addClass('closed').attr('title', opts.messages.show);
+					//useUiIcon('.toggle-form','ui-icon-triangle-1-s');
 					message.html(opts.messages.show);
 					$('#' + target + '-fld').animate({
 						opacity: 'hide',
@@ -469,8 +421,8 @@
 					return false;
 				}
 				if (message.html() === opts.messages.show) {
-					$(this).removeClass('closed').addClass('open');
-					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
+					$(this).removeClass('closed').addClass('open').attr('title', opts.messages.hide);
+					//useUiIcon('.toggle-form','ui-icon-triangle-1-n');
 					message.html(opts.messages.hide);
 					$('#' + target + '-fld').animate({
 						opacity: 'show',
