@@ -18,6 +18,8 @@
 			code_prefix: 'options_',
 			confirm_delete: 'confirm-delete',
 			use_ui_icon: false,
+			select_language: false,
+			default_language: false,
 			messages: {
 				save				: "Save",
 				add_new_field		: "Add New Field...",
@@ -59,8 +61,8 @@
 			$(ul_obj).addClass(frmb_id);
 			// load existing form data
 			if (opts.load_url) {
-				$.getJSON(opts.load_url, function(json) {
-					fromJson(json.form_structure);
+				$.getJSON(opts.load_url + '&language=' + opts.default_language, function(json) {
+					fromJson(json.form_structure, json.form_language);
 				});
 			}
 			// Create form control select box and add into the editor
@@ -88,6 +90,9 @@
 					} else {
 						$(target).append(box_content);
 					}
+					if (opts.select_language) {
+						$(ul_obj).before(opts.select_language);
+					}
 					// Insert the search button
 					$(ul_obj).after(save_button);
 					// Set the form save action
@@ -105,40 +110,56 @@
 						}, 500);
 						return false;
 					});
+					// Add a callback to the select language
+					$('#language').change(function () {
+						var language = $(this).val();
+						if (opts.load_url) {
+							$.getJSON(opts.load_url + '&language=' + language, function(json) {
+								$(ul_obj).children().remove();
+								if (json) {
+									fromJson(json.form_structure, json.form_language);
+								}
+							});
+						}
+						return false;
+					});
 				}(opts.control_box_target);
 			// Json parser to build the form builder
-			var fromJson = function (json) {
+			var fromJson = function (form_structure, form_language) {
 					var values = '';
 					var options = false;
 					var required = false;
 					// Parse json
-					$(json).each(function () {
+					$(form_structure).each(function (i, val) {
 						// checkbox type
 						if (this.cssClass === 'checkbox') {
-							options = [this.title, this.code];
+							var fieldcode = this.code;
+							options = [form_language[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.value, this.baseline]);
+								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						// radio type
 						else if (this.cssClass === 'radio') {
-							options = [this.title, this.code];
+							var fieldcode = this.code;
+							options = [form_language[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.value, this.baseline]);
+								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						// select type
 						else if (this.cssClass === 'select') {
-							options = [this.title, this.multiple, this.code];
+							var fieldcode = this.code;
+							options = [form_language[fieldcode].title, this.multiple, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.value, this.baseline]);
+								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						else {
-							values = [this.values, this.code];
+							values = [form_language[this.code], this.code];
 						}
 						appendNewField(this.cssClass, values, options, this.required);
 					});
@@ -266,14 +287,17 @@
 			var checkboxFieldHtml = function (values) {
 					var checked = false;
 					var value = '';
+					var unique_id = unique_random();
 					if (typeof (values) === 'object') {
-						value = values[0];
-						checked = ( values[1] === 'false' || values[1] === 'undefined' ) ? false : true;
+						unique_id = values[0];
+						value = values[1];
+						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
 					field = '<li class="none">';
 					field += '<div>';
 					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
 					field += '<input type="text" value="' + value + '" />';
+					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
 					field += '</div></li>';
@@ -320,14 +344,17 @@
 			var radioFieldHtml = function (values, name) {
 					var checked = false;
 					var value = '';
+					var unique_id = unique_random();
 					if (typeof (values) === 'object') {
-						value = values[0];
-						checked = ( values[1] === 'false' || values[1] === 'undefined' ) ? false : true;
+						unique_id = values[0];
+						value = values[1];
+						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
 					field = '';
 					field += '<div>';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					field += '<input type="text" value="' + value + '" />';
+					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
 					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
 					field += '</div>';
@@ -528,12 +555,18 @@
 					});
 				}
 			}
+			// Generate random unique id
+			var unique_random = function () {
+				var ts = Math.round((new Date()).getTime() / 1000);
+				return Math.floor(Math.random()*ts);
+			}
 			// saves the serialized data to the server 
 			var save = function () {
+				var language = $('#language option:selected').val();
 				if (opts.save_url) {
 					$.ajax({
 						type: "POST",
-						url: opts.save_url,
+						url: opts.save_url + '&language=' + language,
 						dataType: "json",
 						data: $(ul_obj).serializeFormList({
 							prepend: opts.serialize_prefix,
@@ -584,53 +617,56 @@
 			$(this).children().each(function () {
 				for (att = 0; att < opts.attributes.length; att++) {
 					var key = (opts.attributes[att] === 'class' ? 'cssClass' : opts.attributes[att]);
-					serialStr += opts.prepend + '[' + li_count + '][' + key + ']=' + encodeURIComponent($(this).attr(opts.attributes[att]));
+					var keycode = opts.anchor + $('#' + $(this).attr('id') + ' input[name=code]').val();
+					serialStr += opts.prepend + '[structure][' + li_count + '][' + key + ']=' + encodeURIComponent($(this).attr(opts.attributes[att]));
 					// append the form field values
 					if (opts.attributes[att] === 'class') {
-						serialStr += opts.prepend + '[' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
+						serialStr += opts.prepend + '[structure][' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
 								}
 							});
 							break;
 						case 'select_date':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
 								}
 							});
 							break;
 						case 'textarea':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
 								}
 							});
 							break;
 						case 'checkbox':
 							c = 0;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
-								if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
-								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+								else if ($(this).attr('name') === 'title') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									var keyid = $(this).next().val();
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
 									c++;
 								}
 							});
@@ -638,32 +674,36 @@
 						case 'radio':
 							c = 0;
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
-								if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
-								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+								else if ($(this).attr('name') === 'title') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									var keyid = $(this).next().val();
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
 									c++;
 								}
 							});
 							break;
 						case 'select':
 							c = 0;
-							serialStr += opts.prepend + '[' + li_count + '][multiple]=' + $('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked');
+							serialStr += opts.prepend + '[structure][' + li_count + '][multiple]=' + $('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked');
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
-								if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[' + li_count + '][title]=' + encodeURIComponent($(this).val());
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
-								else if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+								else if ($(this).attr('name') === 'title') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][value]=' + encodeURIComponent($(this).val());
-									serialStr += opts.prepend + '[' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									var keyid = $(this).next().val();
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
 									c++;
 								}
 							});
@@ -671,10 +711,10 @@
 						case 'comment':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
-									serialStr += opts.prepend + '[' + li_count + '][code]=' + opts.anchor + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[' + li_count + '][values]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
 								}
 							});
 							break; 
