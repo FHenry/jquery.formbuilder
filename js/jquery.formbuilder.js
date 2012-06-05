@@ -20,6 +20,7 @@
 			use_ui_icon: false,
 			select_language: false,
 			default_language: false,
+			default_form_language: false,
 			messages: {
 				save				: "Save",
 				add_new_field		: "Add New Field...",
@@ -129,37 +130,54 @@
 					var values = '';
 					var options = false;
 					var required = false;
+					var default_language = $.parseJSON(opts.default_form_language);
 					// Parse json
 					$(form_structure).each(function (i, val) {
 						// checkbox type
 						if (this.cssClass === 'checkbox') {
 							var fieldcode = this.code;
-							options = [form_language[fieldcode].title, fieldcode];
+							var lang = form_language;
+							if (typeof (lang[fieldcode]) === 'undefined') {
+								lang = default_language;
+							}
+							options = [lang[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
+								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						// radio type
 						else if (this.cssClass === 'radio') {
 							var fieldcode = this.code;
-							options = [form_language[fieldcode].title, fieldcode];
+							var lang = form_language;
+							if (typeof (lang[fieldcode]) === 'undefined') {
+								lang = default_language;
+							}
+							options = [lang[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
+								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						// select type
 						else if (this.cssClass === 'select') {
 							var fieldcode = this.code;
-							options = [form_language[fieldcode].title, this.multiple, fieldcode];
+							var lang = form_language;
+							if (typeof (lang[fieldcode]) === 'undefined') {
+								lang = default_language;
+							}
+							options = [lang[fieldcode].title, this.multiple, fieldcode];
 							values = [];
 							$.each(this.values, function () {
-								values.push([this.id, form_language[fieldcode].values[this.id], this.baseline]);
+								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
 							});
 						}
 						else {
-							values = [form_language[this.code], this.code];
+							var lang = form_language;
+							if (typeof (lang[this.code]) === 'undefined') {
+								lang = default_language;
+							}
+							values = [lang[this.code], this.code];
 						}
 						appendNewField(this.cssClass, values, options, this.required);
 					});
