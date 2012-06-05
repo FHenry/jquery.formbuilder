@@ -369,7 +369,7 @@
 					var code = '';
 					if (typeof (options) === 'object') {
 						title = options[0];
-						multiple = options[1] === 'true' ? true : false;
+						multiple = options[1] === 'checked' ? true : false;
 						code = options[2];
 					}
 					field += '<div class="opt_group">';
@@ -573,7 +573,6 @@
 							anchor: opts.code_prefix
 						}),
 						success: function (r) {
-							// TODO add external callback
 							if(r.error) {
 								$.jnotify(r.error, "error", true);
 							} else {
