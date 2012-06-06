@@ -16,7 +16,8 @@
 			serialize_prefix: 'frmb',
 			css_ol_sortable_class : 'ol_opt_sortable',
 			code_prefix: 'options_',
-			confirm_delete: 'confirm-delete',
+			confirm_delete_field: 'confirm-delete-field',
+			confirm_delete_option: 'confirm-delete-option',
 			use_ui_icon: false,
 			select_language: false,
 			default_language: false,
@@ -316,7 +317,7 @@
 					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
 					field += '<input type="text" value="' + value + '" />';
 					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
-					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
+					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
 					field += '</div></li>';
 					useUiIcon('.remove','ui-icon-trash');
@@ -373,7 +374,7 @@
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					field += '<input type="text" value="' + value + '" />';
 					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
-					field += '<a href="#" class="remove" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
+					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
 					field += '</div>';
 					useUiIcon('.remove','ui-icon-trash');
@@ -443,7 +444,7 @@
 					li += '<li id="frm-' + last_id + '-item" class="' + field_type + '">';
 					li += '<div class="legend">';
 					li += '<a id="frm-' + last_id + '" class="toggle-form" href="#">' + opts.messages.hide + '</a> ';
-					li += '<a id="del_' + last_id + '" class="del-button delete-confirm" href="#" title="' + opts.messages.remove_message + '"><span>' + opts.messages.remove + '</span></a>';
+					li += '<a id="del_' + last_id + '" class="del-button delete-confirm-field" href="#" title="' + opts.messages.remove_message + '"><span>' + opts.messages.remove + '</span></a>';
 					li += '<strong id="txt-title-' + last_id + '">' + title + '</strong></div>';
 					li += '<div id="frm-' + last_id + '-fld" class="frm-holder">';
 					li += '<div class="frm-elements">';
@@ -471,17 +472,6 @@
 					useUiIcon('.remove','ui-icon-trash');
 					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				};
-			// handle field delete links
-			$('.remove').live('click', function () {
-				$(this).parent('div').animate({
-					opacity: 'hide',
-					height: 'hide',
-					marginBottom: '0px'
-				}, 'fast', function () {
-					$(this).remove();
-				});
-				return false;
-			});
 			// handle field display/hide
 			$('.toggle-form').live('click', function () {
 				var target = $(this).attr("id");
@@ -512,10 +502,11 @@
 				}
 				return false;
 			});
-			// handle delete confirmation
-			$('.delete-confirm').live('click', function () {
+			// handle field delete confirmation
+			$('.delete-confirm-field').live('click', function () {
 				var delete_id = $(this).attr("id").replace(/del_/, '');
-				$( "#" + opts.confirm_delete ).dialog({
+				var obj = $('#frm-' + delete_id + '-item');
+				$( "#" + opts.confirm_delete_field ).dialog({
 					resizable: false,
 					width: 400,
 					modal: true,
@@ -523,8 +514,8 @@
 					          {
 					        	  text: opts.messages.remove_confirm,
 					        	  click: function() {
-					        		  $( this ).dialog( "close" );
-					        		  $('#frm-' + delete_id + '-item').animate({
+					        		  $(this).dialog("close");
+					        		  obj.animate({
 					        			  opacity: 'hide',
 					        			  height: 'hide',
 					        			  marginBottom: '0px'
@@ -534,7 +525,37 @@
 					          {
 					        	  text: opts.messages.remove_cancel,
 					        	  click: function() {
-					        		  $( this ).dialog( "close" );
+					        		  $(this).dialog("close");
+					        	  }
+					          }
+					     ]
+					});
+				return false;
+			});
+			// handle option delete confirmation
+			$('.delete-confirm-option').live('click', function () {
+				var obj = $(this).parent('div');
+				$( "#" + opts.confirm_delete_option ).dialog({
+					resizable: false,
+					width: 400,
+					modal: true,
+					buttons: [
+					          {
+					        	  text: opts.messages.remove_confirm,
+					        	  click: function() {
+					        		  $(this).dialog("close");
+					        		  obj.animate({
+					        			  opacity: 'hide',
+					        			  height: 'hide',
+					        			  marginBottom: '0px'
+					        		  }, 'fast', function () { $(this).remove(); });
+					        		  return false;
+					        	  }
+					          },
+					          {
+					        	  text: opts.messages.remove_cancel,
+					        	  click: function() {
+					        		  $(this).dialog("close");
 					        	  }
 					          }
 					     ]
