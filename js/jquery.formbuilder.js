@@ -300,7 +300,7 @@
 					help = '';
 					appendFieldLi(opts.messages.checkbox_group, field, required, help, code);
 					
-					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
 			// Checkbox field html, since there may be multiple
 			var checkboxFieldHtml = function (values) {
@@ -312,14 +312,13 @@
 						value = values[1];
 						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
-					field = '<li class="none">';
-					field += '<div>';
+					field = '<div>';
 					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
 					field += '<input type="text" value="' + value + '" />';
 					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
 					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
-					field += '</div></li>';
+					field += '</div>';
 					useUiIcon('.remove','ui-icon-trash');
 					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 					return field;
@@ -357,7 +356,7 @@
 					help = '';
 					appendFieldLi(opts.messages.radio_group, field, required, help, code);
 					
-					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
 			// Radio field html, since there may be multiple
 			var radioFieldHtml = function (values, name) {
@@ -419,7 +418,7 @@
 					help = '';
 					appendFieldLi(opts.messages.select, field, required, help, code);
 					
-					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button' }); // making the dynamically added option fields sortable.
+					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
 			// Select field html, since there may be multiple
 			var selectFieldHtml = function (values, multiple) {
