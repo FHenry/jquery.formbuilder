@@ -63,7 +63,12 @@
 			$(ul_obj).addClass(frmb_id);
 			// load existing form data
 			if (opts.load_url) {
-				$.getJSON(opts.load_url + '&language=' + opts.default_language, function(json) {
+				var load_url = opts.load_url;
+				if (opts.default_language) {
+					var language = opts.default_language;
+					load_url += '&language=' + language;
+				}
+				$.getJSON(load_url, function(json) {
 					fromJson(json.form_structure, json.form_language);
 				});
 			}
@@ -92,10 +97,11 @@
 					} else {
 						$(target).append(box_content);
 					}
+					// Insert the language box
 					if (opts.select_language) {
 						$(ul_obj).before(opts.select_language);
 					}
-					// Insert the search button
+					// Insert the save button
 					$(ul_obj).after(save_button);
 					// Set the form save action
 					$('#' + save_id).click(function () {
@@ -600,11 +606,18 @@
 			}
 			// saves the serialized data to the server 
 			var save = function () {
-				var language = $('#language option:selected').val();
+				var save_url = opts.save_url;
+				if (opts.select_language) {
+					var language = $('#language option:selected').val();
+					save_url += '&language=' + language;
+				} else if (opts.default_language) {
+					var language = opts.default_language;
+					save_url += '&language=' + language;
+				}
 				if (opts.save_url) {
 					$.ajax({
 						type: "POST",
-						url: opts.save_url + '&language=' + language,
+						url: save_url,
 						dataType: "json",
 						data: $(ul_obj).serializeFormList({
 							prepend: opts.serialize_prefix,
