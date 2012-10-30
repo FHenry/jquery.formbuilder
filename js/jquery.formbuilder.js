@@ -679,7 +679,7 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 							});
 							break;
@@ -689,7 +689,7 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 							});
 							break;
@@ -699,7 +699,7 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 							});
 							break;
@@ -710,13 +710,13 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 								else {
 									var keyid = $(this).next().val();
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 									c++;
 								}
 							});
@@ -728,13 +728,13 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 								else {
 									var keyid = $(this).next().val();
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 									c++;
 								}
 							});
@@ -747,13 +747,13 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else if ($(this).attr('name') === 'title') {
-									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 								else {
 									var keyid = $(this).next().val();
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 									c++;
 								}
 							});
@@ -764,7 +764,7 @@
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
 								}
 								else {
-									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val());
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 							});
 							break; 
