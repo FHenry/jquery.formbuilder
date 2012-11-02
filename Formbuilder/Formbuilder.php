@@ -280,7 +280,7 @@ class Formbuilder {
 	 */
 	protected function loadInputText($field, $form_language, $view_type = false, $parameters = false){
 
-		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
+		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 
 		$html = '';
 
