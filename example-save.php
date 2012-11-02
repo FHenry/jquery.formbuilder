@@ -38,7 +38,7 @@ print_r($for_db);
 //Array
 //(
 //    [form_id] => 1
-//    [form_structure] => [{"cssClass":"input_text","required":"undefined","values":"First Name"},{"cssClass":"input_text","required":"undefined","values":"Last Name"},{"cssClass":"textarea","required":"undefined","values":"Bio"},{"cssClass":"checkbox","required":"undefined","title":"What's on your pizza?","values":{"2":{"value":"Extra Cheese","baseline":"undefined"},"3":{"value":"Pepperoni","baseline":"undefined"},"4":{"value":"Beef","baseline":"undefined"}}}]
+//    [form_structure] => [{"type":"input_text","required":"undefined","values":"First Name"},{"type":"input_text","required":"undefined","values":"Last Name"},{"type":"textarea","required":"undefined","values":"Bio"},{"type":"checkbox","required":"undefined","title":"What's on your pizza?","values":{"2":{"value":"Extra Cheese","baseline":"undefined"},"3":{"value":"Pepperoni","baseline":"undefined"},"4":{"value":"Beef","baseline":"undefined"}}}]
 //)
 
 ?>

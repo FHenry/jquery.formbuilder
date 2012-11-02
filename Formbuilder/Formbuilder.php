@@ -164,7 +164,7 @@ class Formbuilder {
 
 				$field['required'] = $field['required'] == 'checked' ? true : false;
 
-				if ($field['cssClass'] == 'input_text' || $field['cssClass'] == 'textarea' || $field['cssClass'] == 'select_date'){
+				if ($field['type'] == 'input_text' || $field['type'] == 'textarea' || $field['type'] == 'select_date'){
 
 					$val = $this->getPostValue($field['code']);
 
@@ -174,7 +174,7 @@ class Formbuilder {
 						$results[$field['code']] = $val;
 					}
 				}
-				elseif ($field['cssClass'] == 'radio' || $field['cssClass'] == 'select'){
+				elseif ($field['type'] == 'radio' || $field['type'] == 'select'){
 
 					$val = $this->getPostValue($field['code']);
 
@@ -184,7 +184,7 @@ class Formbuilder {
 						$results[$field['code']] = $val;
 					}
 				}
-				elseif ($field['cssClass'] == 'checkbox'){
+				elseif ($field['type'] == 'checkbox'){
 
 					$field['values'] = (array) $field['values'];
 
@@ -238,9 +238,9 @@ class Formbuilder {
 	 */
 	protected function loadField($field, $form_language, $view_type = false, $parameters = false){
 
-		if(is_array($field) && isset($field['cssClass'])){
+		if(is_array($field) && isset($field['type'])){
 
-			switch($field['cssClass']){
+			switch($field['type']){
 
 				case 'input_text':
 					return $this->loadInputText($field, $form_language, $view_type, $parameters);
@@ -310,7 +310,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n",	$field['code'], $field_value);
 			$html .= '</li>' . "\n";
@@ -374,7 +374,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'], $field_value);
 			$html .= '</li>' . "\n";
@@ -423,7 +423,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
 			$html .= sprintf('<textarea id="%s" name="%1$s" rows="5" cols="50">%s</textarea>' . "\n", $field['code'], $field_value);
 			$html .= '</li>' . "\n";
@@ -482,7 +482,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 
 			if (isset($form_language[$field['code']]['title']) && ! empty($form_language[$field['code']]['title'])){
 				$html .= sprintf('<span class="false_label">%s</span>' . "\n", $form_language[$field['code']]['title']);
@@ -570,7 +570,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 
 			if (isset($form_language[$field['code']]['title']) && ! empty($form_language[$field['code']]['title'])){
 				$html .= sprintf('<span class="false_label">%s</span>' . "\n", $form_language[$field['code']]['title']);
@@ -668,7 +668,7 @@ class Formbuilder {
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
 
-			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['cssClass']), $field['required'], $field['code']);
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
 
 			if (isset($form_language[$field['code']]['title']) && ! empty($form_language[$field['code']]['title'])){
 				$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]['title']);

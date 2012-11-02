@@ -141,7 +141,7 @@
 					// Parse json
 					$(form_structure).each(function (i, val) {
 						// checkbox type
-						if (this.cssClass === 'checkbox') {
+						if (this.type === 'checkbox') {
 							var fieldcode = this.code;
 							var lang = form_language;
 							if (typeof (lang[fieldcode]) === 'undefined') {
@@ -154,7 +154,7 @@
 							});
 						}
 						// radio type
-						else if (this.cssClass === 'radio') {
+						else if (this.type === 'radio') {
 							var fieldcode = this.code;
 							var lang = form_language;
 							if (typeof (lang[fieldcode]) === 'undefined') {
@@ -167,7 +167,7 @@
 							});
 						}
 						// select type
-						else if (this.cssClass === 'select') {
+						else if (this.type === 'select') {
 							var fieldcode = this.code;
 							var lang = form_language;
 							if (typeof (lang[fieldcode]) === 'undefined') {
@@ -186,7 +186,7 @@
 							}
 							values = [lang[this.code], this.code];
 						}
-						appendNewField(this.cssClass, values, options, this.required);
+						appendNewField(this.type, values, options, this.required);
 					});
 				};
 			// Wrapper for adding a new field
@@ -666,7 +666,7 @@
 			var c = 0;
 			$(this).children().each(function () {
 				for (att = 0; att < opts.attributes.length; att++) {
-					var key = (opts.attributes[att] === 'class' ? 'cssClass' : opts.attributes[att]);
+					var key = (opts.attributes[att] === 'class' ? 'type' : opts.attributes[att]);
 					var keycode = opts.anchor + $('#' + $(this).attr('id') + ' input[name=code]').val();
 					serialStr += opts.prepend + '[structure][' + li_count + '][' + key + ']=' + encodeURIComponent($(this).attr(opts.attributes[att]));
 					// append the form field values
