@@ -832,21 +832,21 @@ class Formbuilder {
 
 		$html = '';
 
+		if (is_array($parameters) && ! empty($parameters))
+		{
+			foreach($parameters as $key=>$value)
+			{
+				$$key=$value;
+			}
+		}
+
 		if ($view_type == 'view')
 		{
-
+			$html .= '<tr><td colspan="'.($colspanvalue + 1).'"><div class="aef_comment">'.$form_language[$field['code']].'</div></td></tr>';
 		}
 		else if ($view_type == 'table')
 		{
-			if (is_array($parameters) && ! empty($parameters))
-			{
-				foreach($parameters as $key=>$value)
-				{
-					$$key=$value;
-				}
-			}
-
-			$html .= '<tr><td>&nbsp;</td><td'.$colspan.'>'.$form_language[$field['code']].'</td></tr>';
+			$html .= '<tr><td colspan="'.($colspanvalue + 1).'"><div class="aef_comment">'.$form_language[$field['code']].'</div></td></tr>';
 		}
 		else
 		{

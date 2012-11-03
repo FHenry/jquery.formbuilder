@@ -225,7 +225,7 @@
 					title = values[0];
 					code = values[1];
 				}
-					field += '<label>' + opts.messages.comment + '</label>';
+					field += '<label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" />';
 					help = '';
 					required = 'disabled';
