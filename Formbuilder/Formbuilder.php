@@ -428,7 +428,6 @@ class Formbuilder {
 		$html.= '<script>';
 		$html.= '$(function() {
 					$( "#'.$field['code'].'_from" ).datepicker({
-						defaultDate: "+1w",
 						changeMonth: true,
 						numberOfMonths: 3,
 						altField: "#'.$field['code'].'_from_timestamp",
@@ -437,7 +436,6 @@ class Formbuilder {
 						}
 					});
 					$( "#'.$field['code'].'_to" ).datepicker({
-						defaultDate: "+1w",
 						changeMonth: true,
 						numberOfMonths: 3,
 						altField: "#'.$field['code'].'_to_timestamp",
@@ -463,10 +461,10 @@ class Formbuilder {
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']]['title'].'</span></td><td'.$colspan.'>';
-			$html .= $form_language[$field['code']]['title_start'] . ' : ';
+			$html .= $form_language[$field['code']]['title_start'] . ' ';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_from',	$date_from);
 			$html .= '<input type="hidden" id="'.$field['code'].'_from_timestamp" name="'.$field['code'].'_from_timestamp" value="'.$timestamp_from.'" />' . "\n"; // Use for timestamp format
-			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' : ';
+			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' ';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_to',	$date_to);
 			$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
