@@ -28,6 +28,9 @@
 				text				: "Text Field",
 				title				: "Title",
 				select_date			: "Date",
+				select_date_range	: "Date range",
+				date_start_label	: "From",
+				date_end_label		: "To",
 				comment				: "Comment",
 				paragraph			: "Paragraph",
 				checkboxes			: "Checkboxes",
@@ -87,6 +90,7 @@
 					select += '<option value="radio">' + opts.messages.radio + '</option>';
 					select += '<option value="select">' + opts.messages.select + '</option>';
 					select += '<option value="select_date">' + opts.messages.select_date + '</option>';
+					select += '<option value="select_date_range">' + opts.messages.select_date_range + '</option>';
 					select += '<option value="comment">' + opts.messages.comment + '</option>';
 					// Build the control box and search button content
 					box_content = '<select id="' + box_id + '" class="frmb-control">' + select + '</select>';
@@ -140,13 +144,13 @@
 					var default_language = $.parseJSON(opts.default_form_language);
 					// Parse json
 					$(form_structure).each(function (i, val) {
+						var fieldcode = this.code;
+						var lang = form_language;
+						if (typeof (lang[fieldcode]) === 'undefined') {
+							lang = default_language;
+						}
 						// checkbox type
 						if (this.type === 'checkbox') {
-							var fieldcode = this.code;
-							var lang = form_language;
-							if (typeof (lang[fieldcode]) === 'undefined') {
-								lang = default_language;
-							}
 							options = [lang[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
@@ -155,11 +159,6 @@
 						}
 						// radio type
 						else if (this.type === 'radio') {
-							var fieldcode = this.code;
-							var lang = form_language;
-							if (typeof (lang[fieldcode]) === 'undefined') {
-								lang = default_language;
-							}
 							options = [lang[fieldcode].title, fieldcode];
 							values = [];
 							$.each(this.values, function () {
@@ -168,23 +167,18 @@
 						}
 						// select type
 						else if (this.type === 'select') {
-							var fieldcode = this.code;
-							var lang = form_language;
-							if (typeof (lang[fieldcode]) === 'undefined') {
-								lang = default_language;
-							}
 							options = [lang[fieldcode].title, this.multiple, fieldcode];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
 							});
 						}
+						// date range type
+						else if (this.type === 'select_date_range') {
+							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
+						}
 						else {
-							var lang = form_language;
-							if (typeof (lang[this.code]) === 'undefined') {
-								lang = default_language;
-							}
-							values = [lang[this.code], this.code];
+							values = [lang[fieldcode], fieldcode];
 						}
 						appendNewField(this.type, values, options, this.required);
 					});
@@ -215,6 +209,9 @@
 					case 'select_date':
 						appendSelectDate(values, required);
 						break;
+					case 'select_date_range':
+						appendSelectDateRange(values, required);
+						break;
 					case 'comment':
 						appendComment(values);
 						break;
@@ -234,7 +231,7 @@
 					required = 'disabled';
 					appendFieldLi(opts.messages.comment_field, field, required, help, code);
 				};
-			// single line input type="text"
+			// select single date
 			var appendSelectDate = function (values, required) {
 					var title = '';
 					var code = '';
@@ -246,6 +243,27 @@
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.select_date, field, required, help, code);
+				};
+			// select date range
+			var appendSelectDateRange = function (values, required) {
+					var title = '';
+					var title_start = '';
+					var title_end = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						title_start = values[1];
+						title_end = values[2];
+						code = values[3];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" name="title" type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.date_start_label + '</label>';
+					field += '<input class="fld-title" id="title-start-' + last_id + '" name="title-start" type="text" value="' + title_start + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.date_end_label + '</label>';
+					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
+					help = '';
+					appendFieldLi(opts.messages.select_date_range, field, required, help, code);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -690,6 +708,22 @@
 								}
 								else {
 									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+							});
+							break;
+						case 'select_date_range':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
+								}
+								else if ($(this).attr('name') === 'title') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+								else if ($(this).attr('name') === 'title-start') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title_start]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+								else if ($(this).attr('name') === 'title-end') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title_end]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
 							});
 							break;
