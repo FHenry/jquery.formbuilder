@@ -842,11 +842,11 @@ class Formbuilder {
 
 		if ($view_type == 'view')
 		{
-			$html .= '<tr><td class="frmb-comment" colspan="'.($colspanvalue + 1).'">'.$form_language[$field['code']].'</td></tr>';
+			$html .= '<tr class="liste_titre"><td colspan="'.($colspanvalue + 1).'">'.$form_language[$field['code']].'</td></tr>';
 		}
 		else if ($view_type == 'table')
 		{
-			$html .= '<tr><td class="frmb-comment" colspan="'.($colspanvalue + 1).'">'.$form_language[$field['code']].'</td></tr>';
+			$html .= '<tr class="liste_titre"><td colspan="'.($colspanvalue + 1).'">'.$form_language[$field['code']].'</td></tr>';
 		}
 		else
 		{
