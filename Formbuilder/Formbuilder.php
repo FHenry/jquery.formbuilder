@@ -180,7 +180,7 @@ class Formbuilder {
 					$val_to = $this->getPostValue($field['code'].'_to');
 
 					if ($field['required'] && (empty($val_from) || empty($val_to))){
-						$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]) . '<br />' . "\n";
+						$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
 					} else {
 						$results[$field['code'].'_from'] = $val_from;
 						$results[$field['code'].'_to'] = $val_to;
