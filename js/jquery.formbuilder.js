@@ -31,6 +31,10 @@
 				select_date_range	: "Date range",
 				date_start_label	: "From",
 				date_end_label		: "To",
+				select_time			: "Time",
+				select_time_range	: "Time range",
+				time_start_label	: "From",
+				time_end_label		: "To",
 				comment				: "Comment",
 				paragraph			: "Paragraph",
 				checkboxes			: "Checkboxes",
@@ -91,6 +95,8 @@
 					select += '<option value="select">' + opts.messages.select + '</option>';
 					select += '<option value="select_date">' + opts.messages.select_date + '</option>';
 					select += '<option value="select_date_range">' + opts.messages.select_date_range + '</option>';
+					//select += '<option value="select_time">' + opts.messages.select_time + '</option>'; // FIXME timepicker is not stable
+					//select += '<option value="select_time_range">' + opts.messages.select_time_range + '</option>'; // FIXME timepicker is not stable
 					select += '<option value="comment">' + opts.messages.comment + '</option>';
 					// Build the control box and search button content
 					box_content = '<select id="' + box_id + '" class="frmb-control">' + select + '</select>';
@@ -177,6 +183,10 @@
 						else if (this.type === 'select_date_range') {
 							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
 						}
+						// time range type
+						else if (this.type === 'select_time_range') {
+							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
+						}
 						else {
 							values = [lang[fieldcode], fieldcode];
 						}
@@ -211,6 +221,12 @@
 						break;
 					case 'select_date_range':
 						appendSelectDateRange(values, required);
+						break;
+					case 'select_time':
+						appendSelectTime(values, required);
+						break;
+					case 'select_time_range':
+						appendSelectTimeRange(values, required);
 						break;
 					case 'comment':
 						appendComment(values);
@@ -264,6 +280,40 @@
 					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.select_date_range, field, required, help, code);
+				};
+			// select single time
+			var appendSelectTime = function (values, required) {
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
+					help = '';
+					appendFieldLi(opts.messages.select_time, field, required, help, code);
+				};
+			// select date range
+			var appendSelectTimeRange = function (values, required) {
+					var title = '';
+					var title_start = '';
+					var title_end = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						title_start = values[1];
+						title_end = values[2];
+						code = values[3];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" name="title" type="text" value="' + title + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.time_start_label + '</label>';
+					field += '<input class="fld-title" id="title-start-' + last_id + '" name="title-start" type="text" value="' + title_start + '" /></div>';
+					field += '<div class="frm-fld"><label>' + opts.messages.time_end_label + '</label>';
+					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
+					help = '';
+					appendFieldLi(opts.messages.select_time_range, field, required, help, code);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -712,6 +762,32 @@
 							});
 							break;
 						case 'select_date_range':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
+								}
+								else if ($(this).attr('name') === 'title') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+								else if ($(this).attr('name') === 'title-start') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title_start]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+								else if ($(this).attr('name') === 'title-end') {
+									serialStr += opts.prepend + '[language][' + keycode + '][title_end]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+							});
+							break;
+						case 'select_time':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
+								}
+								else {
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+							});
+							break;
+						case 'select_time_range':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;

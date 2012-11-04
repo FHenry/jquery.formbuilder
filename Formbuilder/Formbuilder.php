@@ -164,7 +164,7 @@ class Formbuilder {
 
 				$field['required'] = $field['required'] == 'checked' ? true : false;
 
-				if ($field['type'] == 'input_text' || $field['type'] == 'textarea' || $field['type'] == 'select_date'){
+				if ($field['type'] == 'input_text' || $field['type'] == 'textarea' || $field['type'] == 'select_date' || $field['type'] == 'select_time'){
 
 					$val = $this->getPostValue($field['code']);
 
@@ -174,7 +174,7 @@ class Formbuilder {
 						$results[$field['code']] = $val;
 					}
 				}
-				else if ($field['type'] == 'select_date_range'){
+				else if ($field['type'] == 'select_date_range' || $field['type'] == 'select_time_range'){
 
 					$val_from = $this->getPostValue($field['code'].'_from');
 					$val_to = $this->getPostValue($field['code'].'_to');
@@ -274,6 +274,12 @@ class Formbuilder {
 					break;
 				case 'select_date_range':
 					return $this->loadSelectDateRange($field, $form_language, $view_type, $parameters);
+					break;
+				case 'select_time':
+					return $this->loadSelectTime($field, $form_language, $view_type, $parameters);
+					break;
+				case 'select_time_range':
+					return $this->loadSelectTimeRange($field, $form_language, $view_type, $parameters);
 					break;
 				case 'comment':
 					return $this->loadComment($field, $form_language, $view_type, $parameters);
@@ -482,6 +488,148 @@ class Formbuilder {
 		return $html;
 	}
 
+	/**
+	 * Returns html for an input select time
+	 *
+	 * @param array $field Field values from database
+	 * @access protected
+	 * @return string
+	 */
+	protected function loadSelectTime($field, $form_language, $view_type = false, $parameters = false){
+
+		global $db, $conf, $langs;
+
+		$date = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
+		//$timestamp = ($this->getDataValue($field['code'].'_timestamp') ? $this->getDataValue($field['code'].'_timestamp') : $this->getPostValue($field['code'].'_timestamp'));
+		//$date = (! empty($date) ? dol_print_date($date, 'hour') : '');
+		//echo 'date='.$date;
+		$html = '';
+
+		if (is_array($parameters) && ! empty($parameters))
+		{
+			foreach($parameters as $key=>$value)
+			{
+				$$key=$value;
+			}
+		}
+
+		$html.= '<script>';
+		$html.= '$(function() {
+					$( "#'.$field['code'].'" ).timepicker({
+
+					});
+				});';
+		$html.= '</script>';
+
+		if ($view_type == 'view')
+		{
+			$html .= '<tr><td>'.$form_language[$field['code']].'</td><td'.$colspan.'>';
+			$html .= $date;
+			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'table')
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+
+			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'],	$date);
+			//$html .= '<input type="hidden" id="'.$field['code'].'_timestamp" name="'.$field['code'].'_timestamp" value="'.$timestamp.'" />' . "\n"; // Use for timestamp format
+			$html .= '</td></tr>' . "\n";
+		}
+		else
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
+
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
+			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
+			//$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'], $field_value);
+			$html .= '</li>' . "\n";
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Returns html for an input select time range
+	 *
+	 * @param array $field Field values from database
+	 * @access protected
+	 * @return string
+	 */
+	protected function loadSelectTimeRange($field, $form_language, $view_type = false, $parameters = false){
+
+		global $db, $conf, $langs;
+
+		//$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
+		$date_from = ($this->getDataValue($field['code'].'_from') ? $this->getDataValue($field['code'].'_from') : $this->getPostValue($field['code'].'_from'));
+		$date_to = ($this->getDataValue($field['code'].'_to') ? $this->getDataValue($field['code'].'_to') : $this->getPostValue($field['code'].'_to'));
+		//$timestamp_from = ($this->getDataValue($field['code'].'_from_timestamp') ? $this->getDataValue($field['code'].'_from_timestamp') : $this->getPostValue($field['code'].'_from_timestamp'));
+		//$timestamp_to = ($this->getDataValue($field['code'].'_to_timestamp') ? $this->getDataValue($field['code'].'_to_timestamp') : $this->getPostValue($field['code'].'_to_timestamp'));
+		//$date_from = (! empty($timestamp_from) ? dol_print_date(($timestamp_from/1000), 'hour') : '');
+		//$date_to = (! empty($timestamp_to) ? dol_print_date(($timestamp_to/1000), 'hour') : '');
+
+		//$date_from = preg_replace('/\:00$/', '', $date_from);
+
+		$html = '';
+
+		if (is_array($parameters) && ! empty($parameters))
+		{
+			foreach($parameters as $key=>$value)
+			{
+				$$key=$value;
+			}
+		}
+
+		$html.= '<script>';
+		$html.= '$(function() {
+					$( "#'.$field['code'].'_from" ).timepicker({
+						onClose: function( selectedDate ) {
+							//$( "#'.$field['code'].'_to" ).timepicker( "option", "minDate", selectedDate );
+						}
+					});
+					$( "#'.$field['code'].'_to" ).timepicker({
+						onClose: function( selectedDate ) {
+							//$( "#'.$field['code'].'_from" ).timepicker( "option", "maxDate", selectedDate );
+						}
+					});
+				});';
+		$html.= '</script>';
+
+		if ($view_type == 'view')
+		{
+			$html .= '<tr><td>'.$form_language[$field['code']]['title'].'</td><td'.$colspan.'>';
+			if (! empty($date_from) && ! empty($date_to)){
+				$html .= $form_language[$field['code']]['title_start'] . ' ' . $date_from . ' ' . $form_language[$field['code']]['title_end'] . ' ' . $date_to;
+			} else {
+				$html .= '&nbsp;';
+			}
+			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'table')
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+
+			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']]['title'].'</span></td><td'.$colspan.'>';
+			$html .= $form_language[$field['code']]['title_start'] . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_from',	$date_from);
+			//$html .= '<input type="hidden" id="'.$field['code'].'_from_timestamp" name="'.$field['code'].'_from_timestamp" value="'.$timestamp_from.'" />' . "\n"; // Use for timestamp format
+			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_to',	$date_to);
+			//$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
+			$html .= '</td></tr>' . "\n";
+		}
+		else
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
+
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
+			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'], $field_value);
+			$html .= '</li>' . "\n";
+		}
+
+		return $html;
+	}
 
 	/**
 	 * Returns html for a <textarea>
