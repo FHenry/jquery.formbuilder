@@ -18,6 +18,8 @@
 			code_prefix: 'options_',
 			confirm_delete_field: 'confirm-delete-field',
 			confirm_delete_option: 'confirm-delete-option',
+			multiselect_locker: false,
+			warning_multiselect: 'warning-multiselect',
 			use_ui_icon: false,
 			select_language: false,
 			default_language: false,
@@ -470,7 +472,7 @@
 					field += '';
 					field += '<div class="false-label">' + opts.messages.select_options + '</div>';
 					field += '<div class="fields">';
-					field += '<input type="checkbox" name="multiple"' + (multiple ? 'checked="checked"' : '') + '>';
+					field += '<input type="checkbox" class="multiselect" name="multiple"' + (multiple ? ' checked="checked"' + (opts.multiselect_locker ? ' disabled="disabled"' : '') : '') + '>';
 					field += '<label class="auto">' + opts.messages.selections_message + '</label>';
 					
 					field += '<div><ol class="' + opts.css_ol_sortable_class + '">';
@@ -635,6 +637,23 @@
 					});
 				return false;
 			});
+			// handle selection multiple warning
+			if (opts.multiselect_locker) {
+				$('.multiselect').live('click', function () {
+					if ($(this).attr('checked')) {
+						$( "#" + opts.warning_multiselect ).dialog({
+							resizable: false,
+							width: 400,
+							modal: true,
+							buttons: {
+				                Ok: function() {
+				                    $( this ).dialog( "close" );
+				                }
+				            }
+						});
+					}
+				});
+			}
 			// Attach a callback to add new checkboxes
 			$('.add_ck').live('click', function () {
 				$(this).parent().before(checkboxFieldHtml());
@@ -695,6 +714,13 @@
 							if(r.error) {
 								$.jnotify(r.error, "error", true);
 							} else {
+								if (opts.multiselect_locker) {
+									$('.multiselect').each(function () {
+										if ($(this).attr('checked')) {
+											$(this).attr('disabled', 'disabled');
+										}
+									});
+								}
 								$.jnotify(r.status, 1000);
 							}
 						}
