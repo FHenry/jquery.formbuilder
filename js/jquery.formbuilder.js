@@ -498,13 +498,12 @@
 				};
 			// Select field html, since there may be multiple
 			var selectFieldHtml = function (values, multiple) {
-					if (multiple) {
-						return checkboxFieldHtml(values);
-					}
-					else {
-						return radioFieldHtml(values);
-					}
-				};
+				if (multiple) {
+					return checkboxFieldHtml(values);
+				} else {
+					return radioFieldHtml(values);
+				}
+			};
 			// Appends the new field markup to the editor
 			var appendFieldLi = function (title, field_html, required, help, code) {
 					var reg = new RegExp(opts.code_prefix, "gi");
@@ -638,9 +637,9 @@
 				return false;
 			});
 			// handle selection multiple warning
-			if (opts.multiselect_locker) {
-				$('.multiselect').live('click', function () {
-					if ($(this).attr('checked')) {
+			$('.multiselect').live('click', function () {
+				if ( $(this).attr('checked') ) {
+					if (opts.multiselect_locker) {
 						$( "#" + opts.warning_multiselect ).dialog({
 							resizable: false,
 							width: 400,
@@ -652,8 +651,19 @@
 				            }
 						});
 					}
-				});
-			}
+					$(this).parent().find(':radio').each(function() {
+						$(this).after('<input type="checkbox">');
+						$(this).remove();
+					});
+				} else {
+					$(this).parent().find(':checkbox').each(function() {
+						if ($(this).attr('name') != 'multiple') {
+							$(this).after('<input type="radio">');
+							$(this).remove();
+						}
+					});
+				}
+			});
 			// Attach a callback to add new checkboxes
 			$('.add_ck').live('click', function () {
 				$(this).parent().before(checkboxFieldHtml());
