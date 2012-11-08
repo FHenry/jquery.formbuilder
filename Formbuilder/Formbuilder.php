@@ -642,7 +642,6 @@ class Formbuilder {
 			$doleditor = new DolEditor($field['code'], $field_value, '', 200, 'dolibarr_notes', '', false, true, $enabled, 8, 70);
 			$html .= $doleditor->Create(true);
 
-			//$html .= sprintf('<textarea id="%s" name="%1$s" rows="5" cols="50">%s</textarea>' . "\n", $field['code'], $field_value);
 			$html .= '</td></tr>' . "\n";
 		}
 		else
