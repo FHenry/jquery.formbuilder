@@ -335,7 +335,7 @@ class Formbuilder {
 			}
 		}
 
-		$html.= '<script>';
+		$html.= '<script type="text/javascript">';
 		$html.= '$(function() {
 					$( "#'.$field['code'].'" ).datepicker({
 						showOn: "both",
@@ -401,7 +401,7 @@ class Formbuilder {
 			}
 		}
 
-		$html.= '<script>';
+		$html.= '<script type="text/javascript">';
 		$html.= '$(function() {
 					$( "#'.$field['code'].'_from" ).datepicker({
 						changeMonth: true,
@@ -483,7 +483,7 @@ class Formbuilder {
 			}
 		}
 
-		$html.= '<script>';
+		$html.= '<script type="text/javascript">';
 		$html.= '$(function() {
 					$( "#'.$field['code'].'" ).timepicker({
 
@@ -550,7 +550,7 @@ class Formbuilder {
 			}
 		}
 
-		$html.= '<script>';
+		$html.= '<script type="text/javascript">';
 		$html.= '$(function() {
 					$( "#'.$field['code'].'_from" ).timepicker({
 						onClose: function( selectedDate ) {
@@ -660,6 +660,7 @@ class Formbuilder {
 	protected function loadCheckboxGroup($field, $form_language, $view_type = false, $parameters = false){
 
 		$html = '';
+		$defaultChecked = array();
 
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -711,11 +712,12 @@ class Formbuilder {
 			if (isset($field['values']) && is_array($field['values'])){
 
 				$html .= sprintf('<span class="multi-row clearfix">') . "\n";
-				$i=0;
 				foreach($field['values'] as $item){
 
-					// set the default checked value
-					$checked = $item['default'] == 'true' ? true : false;
+					// set the default checked values
+					if ($item['baseline'] == 'checked') {
+						$defaultChecked[] = $item['id'];
+					}
 
 					// load post value
 					$val = ( $this->getDataValue($field['code'], $item['id']) ? $this->getDataValue($field['code'], $item['id']) : $this->getPostValue($field['code'], $item['id']) );
@@ -725,13 +727,26 @@ class Formbuilder {
 					$checked = $checked ? ' checked="checked"' : '';
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					$checkbox = '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%1$s[]" value="%s"%s /> <label for="%1$s-'.$i.'">%s</label></span>' . "\n";
+					$checkbox = '<span class="row clearfix"><input type="checkbox" id="%s_'.$item['id'].'" name="%1$s[]" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></span>' . "\n";
 					$html .= sprintf($checkbox, $field['code'], $item['id'], $checked, $item_value);
-
-					$i++;
 				}
 				$html .= sprintf('</span>') . "\n";
 			}
+
+			// Check if use default checked values
+			$html.= '<script type="text/javascript">';
+			$html.= '$(function() {
+							var defaultChecked = $.parseJSON(\''.json_encode($defaultChecked).'\');
+							if (defaultChecked.length > 0 && countChecked() == 0) {
+								$.each(defaultChecked, function(key, value) {
+									$("#'.$field['code'].'_" + value).attr("checked", "checked");
+								});
+							}
+							function countChecked() {
+								return $( "input[name=\''.$field['code'].'[]\']:checked" ).length;
+							}
+						});';
+			$html.= '</script>';
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
 			else $html .= '</li>' . "\n";
@@ -751,6 +766,7 @@ class Formbuilder {
 	protected function loadRadioGroup($field, $form_language, $view_type = false, $parameters = false){
 
 		$html = '';
+		$defaultChecked = array();
 
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -796,30 +812,44 @@ class Formbuilder {
 
 		if ($view_type != 'view')
 		{
-			if(isset($field['values']) && is_array($field['values'])){
+			if (isset($field['values']) && is_array($field['values'])) {
+
 				$html .= sprintf('<span class="multi-row">') . "\n";
-				$i=0;
 				foreach($field['values'] as $item){
 
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					// set the default checked value
-					$checked = $item['baseline'] == 'checked' ? true : false;
+					// set the default checked values
+					if ($item['baseline'] == 'checked') {
+						$defaultChecked[] = $item['id'];
+					}
 
 					// load post value
 					$val = ( $this->getDataValue($field['code']) && $this->getDataValue($field['code']) == $item['id'] ? $item_value : ($this->getPostValue($field['code']) && $this->getPostValue($field['code']) == $item['id'] ? $item_value : ''));
-					$checked = ! empty($val) ? true : false;
 
 					// if checked, set html
-					$checked = $checked ? ' checked="checked"' : '';
+					$checked = ! empty($val) ? ' checked="checked"' : '';
 
-					$radio = '<span class="row clearfix"><input type="radio" id="%s-'.$i.'" name="%1$s" value="%s"%s /> <label for="%1$s-'.$i.'">%s</label></span>' . "\n";
+					$radio = '<span class="row clearfix"><input type="radio" id="%s_'.$item['id'].'" name="%1$s" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></span>' . "\n";
 					$html .= sprintf($radio, $field['code'], $item['id'], $checked, $item_value);
-
-					$i++;
 				}
 				$html .= sprintf('</span>') . "\n";
 			}
+
+			// Check if use default checked values
+			$html.= '<script type="text/javascript">';
+			$html.= '$(function() {
+							var defaultChecked = $.parseJSON(\''.json_encode($defaultChecked).'\');
+							if (defaultChecked.length > 0 && countChecked() == 0) {
+								$.each(defaultChecked, function(key, value) {
+									$("#'.$field['code'].'_" + value).attr("checked", "checked");
+								});
+							}
+							function countChecked() {
+								return $( "input[name='.$field['code'].']:checked" ).length;
+							}
+						});';
+			$html.= '</script>';
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
 			else $html .= '</li>' . "\n";
@@ -840,6 +870,7 @@ class Formbuilder {
 	protected function loadSelectBox($field, $form_language, $view_type = false, $parameters = false){
 
 		$html = '';
+		$defaultChecked = array();
 
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -894,17 +925,22 @@ class Formbuilder {
 
 		if ($view_type != 'view')
 		{
-			if(isset($field['values']) && is_array($field['values'])){
-				$multiple = $field['multiple'] == "checked" ? ' multiple="multiple"' : '';
+			if (isset($field['values']) && is_array($field['values'])) {
+
+				$id = $field['code'];
+				$multiple = ($field['multiple'] == "checked" ? ' multiple="multiple"' : '');
 				$name = (! empty($multiple) ? $field['code'].'[]' : $field['code']);
-				$html .= sprintf('<select class="flat" name="%s" id="%1$s"%s>' . "\n", $name, $multiple);
+				$html .= sprintf('<select class="flat" name="%s" id="%s"%s>' . "\n", $name, $id, $multiple);
+				$html .= (empty($multiple) ? '<option value=""></option>' . "\n" : ''); // Empty choice
 
 				foreach($field['values'] as $item){
 
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					// set the default checked value
-					$checked = $item['baseline'] == 'checked' ? true : false;
+					// set the default checked values
+					if ($item['baseline'] == 'checked') {
+						$defaultChecked[] = $item['id'];
+					}
 
 					if ($field['multiple'] == 'checked') {
 						$data_value = $this->getDataValue($field['code'], $item['id']);
@@ -916,17 +952,34 @@ class Formbuilder {
 
 					// load post value
 					$val = ($data_value && $data_value == $item['id'] ? $item_value : ($post_value && $post_value == $item['id'] ? $item_value : false));
-					$checked = ! empty($val) ? true : false;
 
 					// if checked, set html
-					$checked = $checked ? ' selected="selected"' : '';
+					$checked = (! empty($val) ? ' selected="selected"' : '');
 
-					$option = '<option value="%s"%s>%s</option>' . "\n";
+					$option = '<option id="%s" value="%1$s"%s>%s</option>' . "\n";
 					$html .= sprintf($option, $item['id'], $checked, $item_value);
 				}
 
 				$html .= '</select>' . "\n";
 
+				// Check if use default checked values
+				$html.= '<script type="text/javascript">';
+				$html.= '$(function() {
+							var defaultChecked = $.parseJSON(\''.json_encode($defaultChecked).'\');
+							if (defaultChecked.length > 0 && countChecked() == 0) {
+								$.each(defaultChecked, function(key, value) {
+									$("#" + value).attr("selected", "selected");
+								});
+							}
+							function countChecked() {
+								var n = 0;
+								$( "#'.$id.'" ).find("option:selected").each(function() {
+									if ($(this).val() != "") n++;
+								});
+								return n;
+							}
+						});';
+				$html.= '</script>';
 			}
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
