@@ -186,7 +186,7 @@ class Formbuilder {
 						$results[$field['code'].'_to'] = $val_to;
 					}
 				}
-				elseif ($field['type'] == 'radio' || $field['type'] == 'select'){
+				elseif ($field['type'] == 'radio' || $field['type'] == 'select' || $field['type'] == 'checkbox'){
 
 					$val = $this->getPostValue($field['code']);
 
@@ -196,36 +196,6 @@ class Formbuilder {
 						$results[$field['code']] = $val;
 					}
 				}
-				elseif ($field['type'] == 'checkbox'){
-
-					$field['values'] = (array) $field['values'];
-
-					if (is_array($field['values']) && ! empty($field['values'])){
-
-						$at_least_one_checked = false;
-
-						$i=0;
-
-						foreach($field['values'] as $item){
-
-							$elem_id = $field['code'].'-'.$i;
-
-							$val = $this->getPostValue($elem_id);
-
-							if (! empty($val)){
-								$at_least_one_checked = true;
-							}
-
-							$results[$elem_id] = $val;
-
-							$i++;
-						}
-
-						if (! $at_least_one_checked && $field['required']){
-							$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
-						}
-					}
-				} else { }
 			}
 		}
 
@@ -703,14 +673,14 @@ class Formbuilder {
 		{
 			$html .= '<tr><td>' . $form_language[$field['code']]['title'] . '</td><td'.$colspan.'>';
 
-			if(isset($field['values']) && is_array($field['values'])){
+			if (isset($field['values']) && is_array($field['values'])){
 				$i=0;
 				foreach($field['values'] as $item){
 
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
 					// load data value
-					$val = $this->getDataValue($field['code'].'-'.$i);
+					$val = $this->getDataValue($field['code'], $item['id']);
 					if (! empty($val)) $html .= $item_value."<br />";
 
 					$i++;
@@ -748,14 +718,14 @@ class Formbuilder {
 					$checked = $item['default'] == 'true' ? true : false;
 
 					// load post value
-					$val = ( $this->getDataValue($field['code'].'-'.$i) ? $this->getDataValue($field['code'].'-'.$i) : $this->getPostValue($field['code'].'-'.$i) );
+					$val = ( $this->getDataValue($field['code'], $item['id']) ? $this->getDataValue($field['code'], $item['id']) : $this->getPostValue($field['code'], $item['id']) );
 					$checked = !empty($val);
 
 					// if checked, set html
 					$checked = $checked ? ' checked="checked"' : '';
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					$checkbox 	= '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%1$s-'.$i.'" value="%s"%s /> <label for="%1$s-'.$i.'">%s</label></span>' . "\n";
+					$checkbox = '<span class="row clearfix"><input type="checkbox" id="%s-'.$i.'" name="%1$s[]" value="%s"%s /> <label for="%1$s-'.$i.'">%s</label></span>' . "\n";
 					$html .= sprintf($checkbox, $field['code'], $item['id'], $checked, $item_value);
 
 					$i++;
