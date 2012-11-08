@@ -613,6 +613,7 @@ class Formbuilder {
 		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 
 		$html = '';
+		$enabled = ($field['wysiwyg'] == 'checked' ? true : false);
 
 		if (is_array($parameters) && ! empty($parameters))
 		{
@@ -625,7 +626,7 @@ class Formbuilder {
 		if ($view_type == 'view')
 		{
 			$html .= '<tr><td>'.$form_language[$field['code']].'</td><td'.$colspan.'>';
-			$html .= dol_nl2br($field_value);
+			$html .= ($enabled ? $field_value : dol_nl2br($field_value));
 			$html .= '</td></tr>' . "\n";
 		}
 		else if ($view_type == 'table')
@@ -633,7 +634,15 @@ class Formbuilder {
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<textarea id="%s" name="%1$s" rows="5" cols="50">%s</textarea>' . "\n", $field['code'], $field_value);
+
+			// Textarea or WYSIWYG Editor
+			if (! class_exists('DolEditor')) {
+				require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+			}
+			$doleditor = new DolEditor($field['code'], $field_value, '', 200, 'dolibarr_notes', '', false, true, $enabled, 8, 70);
+			$html .= $doleditor->Create(true);
+
+			//$html .= sprintf('<textarea id="%s" name="%1$s" rows="5" cols="50">%s</textarea>' . "\n", $field['code'], $field_value);
 			$html .= '</td></tr>' . "\n";
 		}
 		else

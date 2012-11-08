@@ -47,6 +47,7 @@
 				code				: "Code",
 				comment_field		: "Comment Field",
 				paragraph_field		: "Paragraph Field",
+				wysiwyg				: "Wysiwyg Editor",
 				select_options		: "Select Options",
 				add					: "Add",
 				checkbox_group		: "Checkbox Group",
@@ -188,6 +189,10 @@
 						// time range type
 						else if (this.type === 'select_time_range') {
 							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
+						}
+						// textarea type
+						else if (this.type === 'textarea') {
+							values = [lang[fieldcode], fieldcode, this.wysiwyg];
 						}
 						else {
 							values = [lang[fieldcode], fieldcode];
@@ -334,14 +339,16 @@
 			var appendTextarea = function (values, required) {
 					var title = '';
 					var code = '';
+					var wysiwyg = 'disabled';
 					if (typeof (values) === 'object') {
 						title = values[0];
 						code = values[1];
+						wysiwyg = ((values[2] && values[2] != 'undefined') ? values[2] : 'disabled');
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.paragraph_field, field, required, help, code);
+					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, wysiwyg);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
@@ -505,10 +512,10 @@
 				}
 			};
 			// Appends the new field markup to the editor
-			var appendFieldLi = function (title, field_html, required, help, code) {
+			var appendFieldLi = function (title, field_html, required, help, code, wysiwyg = false) {
 					var reg = new RegExp(opts.code_prefix, "gi");
 					if (required != 'disabled') {
-						required = required === 'checked' ? true : false;
+						required = (required === 'checked' ? true : false);
 					}
 					var disabled = '';
 					if (code.length > 0) {
@@ -525,6 +532,10 @@
 					if (required != 'disabled') {
 						li += '<div class="frm-fld"><label for="required-' + last_id + '">' + opts.messages.required + '</label>';
 						li += '<input class="required" type="checkbox" value="1" name="required-' + last_id + '" id="required-' + last_id + '"' + (required ? ' checked="checked"' : '') + ' /></div>';
+					}
+					if (wysiwyg) {
+						li += '<div class="frm-fld"><label for="wysiwyg-' + last_id + '">' + opts.messages.wysiwyg + '</label>';
+						li += '<input class="wysiwyg" type="checkbox" value="1" name="wysiwyg-' + last_id + '" id="wysiwyg-' + last_id + '"' + (wysiwyg != 'disabled' ? ' checked="checked"' : '') + ' /></div>';
 					}
 					li += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
 					li += '<input type="text" name="code" value="' + code.replace(reg, "") + '"' + disabled + ' /></div>';
@@ -840,6 +851,7 @@
 							});
 							break;
 						case 'textarea':
+							serialStr += opts.prepend + '[structure][' + li_count + '][wysiwyg]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.wysiwyg').attr('checked'));
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
