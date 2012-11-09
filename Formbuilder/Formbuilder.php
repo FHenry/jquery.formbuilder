@@ -683,16 +683,20 @@ class Formbuilder {
 			$html .= '<tr><td>' . $form_language[$field['code']]['title'] . '</td><td'.$colspan.'>';
 
 			if (isset($field['values']) && is_array($field['values'])){
-				$i=0;
+
 				foreach($field['values'] as $item){
 
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
 					// load data value
 					$val = $this->getDataValue($field['code'], $item['id']);
-					if (! empty($val)) $html .= $item_value."<br />";
-
-					$i++;
+					if (! empty($val)) {
+						$html .= $item_value;
+						if ($item != end($field['values'])) {
+							if (! empty($field['align']) && $field['align'] == 'horizontal') $html .= ", ";
+							else $html .= "<br />";
+						}
+					}
 				}
 			}
 
@@ -717,7 +721,11 @@ class Formbuilder {
 
 		if ($view_type != 'view')
 		{
-			if (isset($field['values']) && is_array($field['values'])){
+			if (isset($field['values']) && is_array($field['values'])) {
+
+				$tag = 'span';
+				if (! empty($field['align']) && $field['align'] == 'vertical')
+					$tag = 'div';
 
 				$html .= sprintf('<span class="multi-row clearfix">') . "\n";
 				foreach($field['values'] as $item){
@@ -735,7 +743,7 @@ class Formbuilder {
 					$checked = $checked ? ' checked="checked"' : '';
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					$checkbox = '<span class="row clearfix"><input type="checkbox" id="%s_'.$item['id'].'" name="%1$s[]" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></span>' . "\n";
+					$checkbox = '<'.$tag.' class="row clearfix"><input type="checkbox" id="%s_'.$item['id'].'" name="%1$s[]" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
 					$html .= sprintf($checkbox, $field['code'], $item['id'], $checked, $item_value);
 				}
 				$html .= sprintf('</span>') . "\n";
@@ -822,6 +830,10 @@ class Formbuilder {
 		{
 			if (isset($field['values']) && is_array($field['values'])) {
 
+				$tag = 'span';
+				if (! empty($field['align']) && $field['align'] == 'vertical')
+					$tag = 'div';
+
 				$html .= sprintf('<span class="multi-row">') . "\n";
 				foreach($field['values'] as $item){
 
@@ -838,7 +850,7 @@ class Formbuilder {
 					// if checked, set html
 					$checked = ! empty($val) ? ' checked="checked"' : '';
 
-					$radio = '<span class="row clearfix"><input type="radio" id="%s_'.$item['id'].'" name="%1$s" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></span>' . "\n";
+					$radio = '<'.$tag.' class="row clearfix"><input type="radio" id="%s_'.$item['id'].'" name="%1$s" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
 					$html .= sprintf($radio, $field['code'], $item['id'], $checked, $item_value);
 				}
 				$html .= sprintf('</span>') . "\n";
@@ -892,9 +904,9 @@ class Formbuilder {
 		{
 			$html .= '<tr><td>' . $form_language[$field['code']]['title'] . '</td><td'.$colspan.'>';
 
-			if(isset($field['values']) && is_array($field['values'])){
+			if (isset($field['values']) && is_array($field['values'])) {
 
-				foreach($field['values'] as $item){
+				foreach($field['values'] as $item) {
 
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
@@ -902,7 +914,10 @@ class Formbuilder {
 
 					if ($field['multiple'] == 'checked') {
 						$data_value = $this->getDataValue($field['code'], $item['id']);
-						if (! empty($data_value)) $return = "<br />";
+						if (! empty($data_value) && ($item != end($field['values']))) {
+							if (! empty($field['align']) && $field['align'] == 'horizontal') $return = ", ";
+							else $return = "<br />";
+						}
 					} else {
 						$data_value = $this->getDataValue($field['code']);
 					}

@@ -59,6 +59,9 @@
 				move				: "Move",
 				radio_group			: "Radio Group",
 				selections_message	: "Allow Multiple Selections",
+				align_label			: "Type of alignement",
+				align_vertical		: "Vertically",
+				align_horizontal	: "Horizontally",
 				hide				: "Hide",
 				required			: "Required",
 				show				: "Show"
@@ -160,7 +163,7 @@
 						}
 						// checkbox type
 						if (this.type === 'checkbox') {
-							options = [lang[fieldcode].title, fieldcode];
+							options = [lang[fieldcode].title, fieldcode, this.align];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -168,7 +171,7 @@
 						}
 						// radio type
 						else if (this.type === 'radio') {
-							options = [lang[fieldcode].title, fieldcode];
+							options = [lang[fieldcode].title, fieldcode, this.align];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -176,7 +179,7 @@
 						}
 						// select type
 						else if (this.type === 'select') {
-							options = [lang[fieldcode].title, this.multiple, fieldcode];
+							options = [lang[fieldcode].title, this.multiple, fieldcode, this.align];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -348,15 +351,17 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, wysiwyg);
+					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, false, wysiwyg);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
 					var title = '';
 					var code = '';
+					var align = 'horizontal';
 					if (typeof (options) === 'object') {
 						title = options[0];
 						code = options[1];
+						align = ((options[2] && options[2] != 'undefined') ? options[2] : 'horizontal');
 					}
 					field += '<div class="chk_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -381,7 +386,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.checkbox_group, field, required, help, code);
+					appendFieldLi(opts.messages.checkbox_group, field, required, help, code, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -410,9 +415,11 @@
 			var appendRadioGroup = function (values, options, required) {
 					var title = '';
 					var code = '';
+					var align = 'horizontal';
 					if (typeof (options) === 'object') {
 						title = options[0];
 						code = options[1];
+						align = ((options[2] && options[2] != 'undefined') ? options[2] : 'horizontal');
 					}
 					field += '<div class="rd_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -437,7 +444,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.radio_group, field, required, help, code);
+					appendFieldLi(opts.messages.radio_group, field, required, help, code, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -468,10 +475,13 @@
 					var multiple = false;
 					var title = '';
 					var code = '';
+					var align = 'horizontal';
 					if (typeof (options) === 'object') {
 						title = options[0];
 						multiple = options[1] === 'checked' ? true : false;
 						code = options[2];
+						align = ((options[3] && options[3] != 'undefined') ? options[3] : 'horizontal');
+						align = (multiple ? align : false);
 					}
 					field += '<div class="opt_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -499,7 +509,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.select, field, required, help, code);
+					appendFieldLi(opts.messages.select, field, required, help, code, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -512,7 +522,7 @@
 				}
 			};
 			// Appends the new field markup to the editor
-			var appendFieldLi = function (title, field_html, required, help, code, wysiwyg = false) {
+			var appendFieldLi = function (title, field_html, required, help, code, align = false, wysiwyg = false) {
 					var reg = new RegExp(opts.code_prefix, "gi");
 					if (required != 'disabled') {
 						required = (required === 'checked' ? true : false);
@@ -520,6 +530,10 @@
 					var disabled = '';
 					if (code.length > 0) {
 						disabled = ' disabled="disabled"';
+					}
+					var alignClass = ' hideobject';
+					if (align) {
+						alignClass = ' frm-fld';
 					}
 					var li = '';
 					li += '<li id="frm-' + last_id + '-item" class="' + field_type + '">';
@@ -537,6 +551,12 @@
 						li += '<div class="frm-fld"><label for="wysiwyg-' + last_id + '">' + opts.messages.wysiwyg + '</label>';
 						li += '<input class="wysiwyg" type="checkbox" value="1" name="wysiwyg-' + last_id + '" id="wysiwyg-' + last_id + '"' + (wysiwyg != 'disabled' ? ' checked="checked"' : '') + ' /></div>';
 					}
+					li += '<div class="align-bloc' + alignClass + '"><label for="align-' + last_id + '">' + opts.messages.align_label + '</label>';
+					li += '<input class="align" type="radio" value="horizontal" name="align-' + last_id + '" id="align-horizontal-' + last_id + '"' + (align != 'vertical' ? ' checked="checked"' : '') + ' />';
+					li += ' ' + opts.messages.align_horizontal + ' ';
+					li += '<input class="align" type="radio" value="vertical" name="align-' + last_id + '" id="align-vertical-' + last_id + '"' + (align == 'vertical' ? ' checked="checked"' : '') + ' />';
+					li += ' ' + opts.messages.align_vertical + ' ';
+					li += '</div>';
 					li += '<div class="frm-fld"><label>' + opts.messages.code + '</label>';
 					li += '<input type="text" name="code" value="' + code.replace(reg, "") + '"' + disabled + ' /></div>';
 					li += field_html;
@@ -666,12 +686,18 @@
 						$(this).after('<input type="checkbox">');
 						$(this).remove();
 					});
+					$(this).parents('.frm-elements').find('.align-bloc').each(function() {
+						$(this).addClass('frm-fld').show();
+					});
 				} else {
 					$(this).parent().find(':checkbox').each(function() {
 						if ($(this).attr('name') != 'multiple') {
 							$(this).after('<input type="radio">');
 							$(this).remove();
 						}
+					});
+					$(this).parents('.frm-elements').find('.align-bloc').each(function() {
+						$(this).removeClass('frm-fld').hide();
 					});
 				}
 			});
@@ -863,6 +889,7 @@
 							break;
 						case 'checkbox':
 							c = 0;
+							serialStr += opts.prepend + '[structure][' + li_count + '][align]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.align:checked').val());
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
@@ -881,6 +908,7 @@
 							break;
 						case 'radio':
 							c = 0;
+							serialStr += opts.prepend + '[structure][' + li_count + '][align]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.align:checked').val());
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
@@ -899,7 +927,10 @@
 							break;
 						case 'select':
 							c = 0;
-							serialStr += opts.prepend + '[structure][' + li_count + '][multiple]=' + $('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked');
+							serialStr += opts.prepend + '[structure][' + li_count + '][multiple]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked'));
+							if ($('#' + $(this).attr('id') + ' input[name=multiple]').attr('checked')) {
+								serialStr += opts.prepend + '[structure][' + li_count + '][align]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.align:checked').val());
+							}
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
