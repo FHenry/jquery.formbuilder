@@ -16,8 +16,10 @@ ul.frmb {
 }
 
 .frmb li:hover {
-	border: 1px solid #F7CA75;
-	background: #FFFEEB;
+	/*border: 1px solid #F7CA75;*/
+	/*background: #FFFEEB;*/
+	border: 1px solid #000;
+	background: #E9EDF2;
 }
 
 .frmb .legend {
@@ -112,9 +114,17 @@ ul.frmb {
 .frm-elements,
 .frm-fld { display: block }
 
-.del-button {
+.del-button, .power-button {
 	float: right;
 	margin-right: 10px;
+}
+
+.power-button-on {
+	background: #B6E3C3 !important;
+}
+
+.power-button-off {
+	background: #FAA0A0 !important;
 }
 
 .ol_opt_sortable {

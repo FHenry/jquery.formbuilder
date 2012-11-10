@@ -62,9 +62,11 @@
 				align_label			: "Type of alignement",
 				align_vertical		: "Vertically",
 				align_horizontal	: "Horizontally",
-				hide				: "Hide",
 				required			: "Required",
-				show				: "Show"
+				show				: "Show",
+				hide				: "Hide",
+				enabled				: "Enabled",
+				disabled			: "Disabled"
 			}
 		};
 		var opts = $.extend(defaults, options);
@@ -163,7 +165,7 @@
 						}
 						// checkbox type
 						if (this.type === 'checkbox') {
-							options = [lang[fieldcode].title, fieldcode, this.align];
+							options = [lang[fieldcode].title, fieldcode, this.align, this.active];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -171,7 +173,7 @@
 						}
 						// radio type
 						else if (this.type === 'radio') {
-							options = [lang[fieldcode].title, fieldcode, this.align];
+							options = [lang[fieldcode].title, fieldcode, this.align, this.active];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -179,7 +181,7 @@
 						}
 						// select type
 						else if (this.type === 'select') {
-							options = [lang[fieldcode].title, this.multiple, fieldcode, this.align];
+							options = [lang[fieldcode].title, this.multiple, fieldcode, this.align, this.active];
 							values = [];
 							$.each(this.values, function () {
 								values.push([this.id, lang[fieldcode].values[this.id], this.baseline]);
@@ -187,18 +189,18 @@
 						}
 						// date range type
 						else if (this.type === 'select_date_range') {
-							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
+							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode, this.active];
 						}
 						// time range type
 						else if (this.type === 'select_time_range') {
-							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode];
+							values = [lang[fieldcode].title, lang[fieldcode].title_start, lang[fieldcode].title_end, fieldcode, this.active];
 						}
 						// textarea type
 						else if (this.type === 'textarea') {
-							values = [lang[fieldcode], fieldcode, this.wysiwyg];
+							values = [lang[fieldcode], fieldcode, this.wysiwyg, this.active];
 						}
 						else {
-							values = [lang[fieldcode], fieldcode];
+							values = [lang[fieldcode], fieldcode, this.active];
 						}
 						appendNewField(this.type, values, options, this.required);
 					});
@@ -250,12 +252,13 @@
 				if (typeof (values) === 'object') {
 					title = values[0];
 					code = values[1];
+					active = values[2];
 				}
 					field += '<label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" />';
 					help = '';
 					required = 'disabled';
-					appendFieldLi(opts.messages.comment_field, field, required, help, code);
+					appendFieldLi(opts.messages.comment_field, field, required, help, code, active);
 				};
 			// select single date
 			var appendSelectDate = function (values, required) {
@@ -264,11 +267,12 @@
 					if (typeof (values) === 'object') {
 						title = values[0];
 						code = values[1];
+						active = values[2];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_date, field, required, help, code);
+					appendFieldLi(opts.messages.select_date, field, required, help, code, active);
 				};
 			// select date range
 			var appendSelectDateRange = function (values, required) {
@@ -281,6 +285,7 @@
 						title_start = values[1];
 						title_end = values[2];
 						code = values[3];
+						active = values[4];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" name="title" type="text" value="' + title + '" /></div>';
@@ -289,7 +294,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.date_end_label + '</label>';
 					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_date_range, field, required, help, code);
+					appendFieldLi(opts.messages.select_date_range, field, required, help, code, active);
 				};
 			// select single time
 			var appendSelectTime = function (values, required) {
@@ -298,11 +303,12 @@
 					if (typeof (values) === 'object') {
 						title = values[0];
 						code = values[1];
+						active = values[3];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_time, field, required, help, code);
+					appendFieldLi(opts.messages.select_time, field, required, help, code, active);
 				};
 			// select date range
 			var appendSelectTimeRange = function (values, required) {
@@ -315,6 +321,7 @@
 						title_start = values[1];
 						title_end = values[2];
 						code = values[3];
+						active = values[4];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" name="title" type="text" value="' + title + '" /></div>';
@@ -323,7 +330,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.time_end_label + '</label>';
 					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_time_range, field, required, help, code);
+					appendFieldLi(opts.messages.select_time_range, field, required, help, code, active);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -332,11 +339,12 @@
 					if (typeof (values) === 'object') {
 						title = values[0];
 						code = values[1];
+						active = values[2];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.text, field, required, help, code);
+					appendFieldLi(opts.messages.text, field, required, help, code, active);
 				};
 			// multi-line textarea
 			var appendTextarea = function (values, required) {
@@ -347,11 +355,12 @@
 						title = values[0];
 						code = values[1];
 						wysiwyg = ((values[2] && values[2] != 'undefined') ? values[2] : 'disabled');
+						active = values[3];
 					}
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, false, wysiwyg);
+					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, active, false, wysiwyg);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
@@ -362,6 +371,7 @@
 						title = options[0];
 						code = options[1];
 						align = ((options[2] && options[2] != 'undefined') ? options[2] : 'horizontal');
+						active = options[3];
 					}
 					field += '<div class="chk_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -386,7 +396,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.checkbox_group, field, required, help, code, align);
+					appendFieldLi(opts.messages.checkbox_group, field, required, help, code, active, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -420,6 +430,7 @@
 						title = options[0];
 						code = options[1];
 						align = ((options[2] && options[2] != 'undefined') ? options[2] : 'horizontal');
+						active = options[3];
 					}
 					field += '<div class="rd_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -444,7 +455,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.radio_group, field, required, help, code, align);
+					appendFieldLi(opts.messages.radio_group, field, required, help, code, active, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -482,6 +493,7 @@
 						code = options[2];
 						align = ((options[3] && options[3] != 'undefined') ? options[3] : 'horizontal');
 						align = (multiple ? align : false);
+						active = options[4];
 					}
 					field += '<div class="opt_group">';
 					field += '<div class="frm-fld"><label>' + opts.messages.title + '</label>';
@@ -509,7 +521,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.select, field, required, help, code, align);
+					appendFieldLi(opts.messages.select, field, required, help, code, active, align);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -522,7 +534,7 @@
 				}
 			};
 			// Appends the new field markup to the editor
-			var appendFieldLi = function (title, field_html, required, help, code, align = false, wysiwyg = false) {
+			var appendFieldLi = function (title, field_html, required, help, code, active = true, align = false, wysiwyg = false) {
 					var reg = new RegExp(opts.code_prefix, "gi");
 					if (required != 'disabled') {
 						required = (required === 'checked' ? true : false);
@@ -535,11 +547,16 @@
 					if (align) {
 						alignClass = ' frm-fld';
 					}
+					var powerClass = 'power-button-on';
+					if (active == 'false') {
+						powerClass = 'power-button-off';
+					}
 					var li = '';
 					li += '<li id="frm-' + last_id + '-item" class="' + field_type + '">';
 					li += '<div class="legend">';
 					li += '<a id="frm-' + last_id + '" class="toggle-form" href="#">' + opts.messages.hide + '</a> ';
-					li += '<a id="del_' + last_id + '" class="del-button delete-confirm-field" href="#" title="' + opts.messages.remove_message + '"><span>' + opts.messages.remove + '</span></a>';
+					li += '<div id="del-' + last_id + '" class="del-button delete-confirm-field" title="' + opts.messages.remove_message + '"><span>' + opts.messages.remove + '</span></div>';
+					li += '<div id="power-' + last_id + '" class="power-button ' + powerClass + '">' + opts.messages.enabled + '</div> ';
 					li += '<strong id="txt-title-' + last_id + '">' + title + '</strong></div>';
 					li += '<div id="frm-' + last_id + '-fld" class="frm-holder">';
 					li += '<div class="frm-elements">';
@@ -571,6 +588,7 @@
 					}, 'slow');
 					last_id++;
 					// Use ui-icon
+					useUiIcon('.power-button','ui-icon-power');
 					useUiIcon('.del-button','ui-icon-trash');
 					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
 					useUiIcon('.add','ui-icon-plus');
@@ -607,9 +625,21 @@
 				}
 				return false;
 			});
+			// handle field on/off
+			$('.power-button').live('click', function () {
+				if ($(this).hasClass('power-button-on')) {
+					$(this).removeClass('power-button-on')
+							.addClass('power-button-off')
+							.attr('title', opts.messages.disabled);
+				} else if ($(this).hasClass('power-button-off')) {
+					$(this).removeClass('power-button-off')
+							.addClass('power-button-on')
+							.attr('title', opts.messages.enabled);
+				}
+			});
 			// handle field delete confirmation
 			$('.delete-confirm-field').live('click', function () {
-				var delete_id = $(this).attr("id").replace(/del_/, '');
+				var delete_id = $(this).attr("id").replace(/del-/, '');
 				var obj = $('#frm-' + delete_id + '-item');
 				$( "#" + opts.confirm_delete_field ).dialog({
 					resizable: false,
@@ -812,6 +842,12 @@
 					serialStr += opts.prepend + '[structure][' + li_count + '][' + key + ']=' + encodeURIComponent($(this).attr(opts.attributes[att]));
 					// append the form field values
 					if (opts.attributes[att] === 'class') {
+						var powerbutton = $('#' + $(this).attr('id') + ' .power-button');
+						if (powerbutton.hasClass('power-button-on')) {
+							serialStr += opts.prepend + '[structure][' + li_count + '][active]=true';
+						} else if (powerbutton.hasClass('power-button-off')) {
+							serialStr += opts.prepend + '[structure][' + li_count + '][active]=false';
+						}
 						serialStr += opts.prepend + '[structure][' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':

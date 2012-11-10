@@ -111,20 +111,27 @@ class Formbuilder {
 		$html = '';
 
 		if (is_array($this->_form_array['form_structure'])) {
-			if (! $form_action)
-			{
+
+			if (! $form_action) {
+
 				foreach($this->_form_array['form_structure'] as $field) {
+
+					if ($field['active'] == 'false') continue;
+
 					$html .= $this->loadField((array) $field, $this->_form_array['form_language'], $view_type, $parameters);
 				}
-			}
-			else
-			{
+
+			} else {
+
 				$form_action = $form_action ? $form_action : $_SERVER['PHP_SELF'];
 
 				$html .= '<form class="frm-bldr" method="post" action="'.$form_action.'">' . "\n";
 				$html .= '<ol>'."\n";
 
-				foreach($this->_form_array['form_structure'] as $field){
+				foreach($this->_form_array['form_structure'] as $field) {
+
+					if ($field['active'] == 'false') continue;
+
 					$html .= $this->loadField((array) $field);
 				}
 
@@ -220,9 +227,9 @@ class Formbuilder {
 	 */
 	protected function loadField($field, $form_language, $view_type = false, $parameters = false){
 
-		if(is_array($field) && isset($field['type'])){
+		if (is_array($field) && isset($field['type'])) {
 
-			switch($field['type']){
+			switch($field['type']) {
 
 				case 'input_text':
 					return $this->loadInputText($field, $form_language, $view_type, $parameters);
