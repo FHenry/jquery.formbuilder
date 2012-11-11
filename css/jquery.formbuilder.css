@@ -136,4 +136,5 @@ ul.frmb {
 
 .move-button {
 	margin-left: 10px;
+	cursor: move;
 }

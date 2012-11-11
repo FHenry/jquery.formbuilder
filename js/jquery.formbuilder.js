@@ -421,7 +421,7 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
 					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
-					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
+					field += '<span class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</span>';
 					field += '</div>';
 					useUiIcon('.remove','ui-icon-trash');
 					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
@@ -481,7 +481,7 @@
 					field += '<input type="text" value="' + value + '" />';
 					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
 					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
-					field += '<a href="#" class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</a>';
+					field += '<span class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</span>';
 					field += '</div>';
 					useUiIcon('.remove','ui-icon-trash');
 					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
@@ -760,21 +760,23 @@
 			});
 			// Attach a callback to add new checkboxes
 			$('.add_ck').live('click', function () {
-				$(this).parent().before(checkboxFieldHtml());
+				$(this).parents('.frm-elements').find('ol').append(checkboxFieldHtml());
 				useUiIcon('.remove','ui-icon-trash');
 				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
 			});
 			// Attach a callback to add new options
 			$('.add_opt').live('click', function () {
-				$(this).parent().before(selectFieldHtml('', false));
+				var parentElement = $(this).parents('.frm-elements');
+				var multiple = (parentElement.find('.multiselect').attr('checked') ? true : false);
+				parentElement.find('ol').append(selectFieldHtml('', multiple));
 				useUiIcon('.remove','ui-icon-trash');
 				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
 			});
 			// Attach a callback to add new radio fields
 			$('.add_rd').live('click', function () {
-				$(this).parent().before(radioFieldHtml(false, $(this).parents('.frm-holder').attr('id')));
+				$(this).parents('.frm-elements').find('ol').append(radioFieldHtml(false, $(this).parents('.frm-holder').attr('id')));
 				useUiIcon('.remove','ui-icon-trash');
 				useUiIcon('.move-button','ui-icon-triangle-2-n-s');
 				return false;
