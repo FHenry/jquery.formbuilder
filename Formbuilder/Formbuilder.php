@@ -157,60 +157,85 @@ class Formbuilder {
 
 		global $langs;
 
-		$error		= array();
-		$results 	= array();
+		$errors=array();
+		$results=array();
 
 		// Put together an array of all expected indices
-		if (is_array($this->_form_array['form_structure'])){
+		if (is_array($this->_form_array['form_structure'])) {
 
 			$form_language = $this->_form_array['form_language'];
 
 			foreach($this->_form_array['form_structure'] as $field) {
 
-				if ($field['active'] == 'false' || $field['active'] == 'locked') continue;
-
 				$field = (array) $field;
 
-				$field['required'] = $field['required'] == 'checked' ? true : false;
+				if ($field['active'] == 'false' || $field['active'] == 'locked') continue;
+
+				$required = ($field['required'] == 'checked' ? true : false);
 
 				if ($field['type'] == 'input_text' || $field['type'] == 'textarea' || $field['type'] == 'select_date' || $field['type'] == 'select_time'){
 
 					$val = $this->getPostValue($field['code']);
 
-					if ($field['required'] && empty($val)){
-						$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]) . '<br />' . "\n";
+					if ($required && empty($val)) {
+
+						$errors[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]) . '<br />' . "\n";
+
+					} else {
+
+						$results[$field['code']] = $val;
+					}
+				}
+				else if ($field['type'] == 'numeric') {
+
+					$val = price2num($this->getPostValue($field['code']));
+
+					if ($required && ! isset($val)) {
+
+						$errors[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]) . '<br />' . "\n";
+
+					} else if (! is_numeric($val)) {
+
+						$errors[] .= $langs->trans('ErrorFieldMustBeNumeric', $form_language[$field['code']]) . '<br />' . "\n";
+
 					} else {
 						$results[$field['code']] = $val;
 					}
 				}
-				else if ($field['type'] == 'select_date_range' || $field['type'] == 'select_time_range'){
+				else if ($field['type'] == 'select_date_range' || $field['type'] == 'select_time_range') {
 
 					$val_from = $this->getPostValue($field['code'].'_from');
 					$val_to = $this->getPostValue($field['code'].'_to');
 
-					if ($field['required'] && (empty($val_from) || empty($val_to))){
-						$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
+					if ($required && (empty($val_from) || empty($val_to))) {
+
+						$errors[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
+
 					} else {
+
 						$results[$field['code'].'_from'] = $val_from;
 						$results[$field['code'].'_to'] = $val_to;
 					}
 				}
-				elseif ($field['type'] == 'radio' || $field['type'] == 'select' || $field['type'] == 'checkbox'){
+				elseif ($field['type'] == 'radio' || $field['type'] == 'select' || $field['type'] == 'checkbox') {
 
 					$val = $this->getPostValue($field['code']);
 
-					if ($field['required'] && empty($val)){
-						$error[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
+					if ($required && empty($val)) {
+
+						$errors[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]['title']) . '<br />' . "\n";
+
 					} else {
+
 						$results[$field['code']] = $val;
 					}
 				}
 			}
 		}
 
-		$success = empty($error);
+		$success = empty($errors);
 
-		return array('success'=>$success,'results'=>$results,'errors'=>$error);
+		return array('success'=>$success,'results'=>$results,'errors'=>$errors);
 
 	}
 
@@ -238,6 +263,9 @@ class Formbuilder {
 					break;
 				case 'textarea':
 					return $this->loadTextarea($field, $form_language, $view_type, $parameters);
+					break;
+				case 'numeric':
+					return $this->loadInputNumeric($field, $form_language, $view_type, $parameters);
 					break;
 				case 'checkbox':
 					return $this->loadCheckboxGroup($field, $form_language, $view_type, $parameters);
@@ -279,6 +307,55 @@ class Formbuilder {
 	 * @return string
 	 */
 	protected function loadInputText($field, $form_language, $view_type = false, $parameters = false){
+
+		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
+
+		$html = '';
+
+		if (is_array($parameters) && ! empty($parameters))
+		{
+			foreach($parameters as $key=>$value)
+			{
+				$$key=$value;
+			}
+		}
+
+		if ($view_type == 'view')
+		{
+			$html .= '<tr><td>'.$form_language[$field['code']].'</td><td'.$colspan.'>';
+			$html .= $field_value;
+			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'table')
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+
+			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
+			$html .= '</td></tr>' . "\n";
+		}
+		else
+		{
+			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
+
+			$html .= sprintf('<li class="%s%s" id="fld-%s">' . "\n", $this->elemId($field['type']), $field['required'], $field['code']);
+			$html .= sprintf('<label for="%s">%s</label>' . "\n", $field['code'], $form_language[$field['code']]);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n",	$field['code'], $field_value);
+			$html .= '</li>' . "\n";
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Returns html for an input numeric
+	 *
+	 * @param array $field Field values from database
+	 * @access protected
+	 * @return string
+	 */
+	protected function loadInputNumeric($field, $form_language, $view_type = false, $parameters = false){
 
 		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 

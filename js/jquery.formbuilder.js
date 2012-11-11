@@ -28,6 +28,7 @@
 				save				: "Save",
 				add_new_field		: "Add New Field...",
 				text				: "Text Field",
+				numeric				: "Numeric Field",
 				title				: "Title",
 				select_date			: "Date",
 				select_date_range	: "Date range",
@@ -43,6 +44,7 @@
 				radio				: "Radio",
 				select				: "Select List",
 				text_field			: "Text Field",
+				numeric_field		: "Numeric Field",
 				label				: "Label",
 				code				: "Code",
 				comment_field		: "Comment Field",
@@ -99,6 +101,7 @@
 					select += '<option value="0">' + opts.messages.add_new_field + '</option>';
 					select += '<option value="input_text">' + opts.messages.text + '</option>';
 					select += '<option value="textarea">' + opts.messages.paragraph + '</option>';
+					select += '<option value="numeric">' + opts.messages.numeric + '</option>';
 					select += '<option value="checkbox">' + opts.messages.checkboxes + '</option>';
 					select += '<option value="radio">' + opts.messages.radio + '</option>';
 					select += '<option value="select">' + opts.messages.select + '</option>';
@@ -224,6 +227,9 @@
 						break;
 					case 'textarea':
 						appendTextarea(values, required);
+						break;
+					case 'numeric':
+						appendNumericInput(values, required);
 						break;
 					case 'checkbox':
 						appendCheckboxGroup(values, options, required);
@@ -367,6 +373,20 @@
 					field += '<input type="text" value="' + title + '" /></div>';
 					help = '';
 					appendFieldLi(opts.messages.paragraph_field, field, required, help, code, active, false, wysiwyg);
+				};
+			// single line numeric input type="text"
+			var appendNumericInput = function (values, required) {
+					var title = '';
+					var code = '';
+					if (typeof (values) === 'object') {
+						title = values[0];
+						code = values[1];
+						active = values[2];
+					}
+					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
+					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
+					help = '';
+					appendFieldLi(opts.messages.numeric, field, required, help, code, active);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
@@ -882,6 +902,16 @@
 						serialStr += opts.prepend + '[structure][' + li_count + '][required]=' + encodeURIComponent($('#' + $(this).attr('id') + ' input.required').attr('checked'));
 						switch ($(this).attr(opts.attributes[att])) {
 						case 'input_text':
+							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
+								if ($(this).attr('name') === 'code') {
+									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
+								}
+								else {
+									serialStr += opts.prepend + '[language][' + keycode + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+							});
+							break;
+						case 'numeric':
 							$('#' + $(this).attr('id') + ' input[type=text]').each(function () {
 								if ($(this).attr('name') === 'code') {
 									serialStr += opts.prepend + '[structure][' + li_count + '][code]=' + keycode;
