@@ -137,7 +137,9 @@
 						}, 500);
 						// Default element power button
 						useUiIcon('#power-' + (last_id - 1),'ui-icon-power');
-						$('#power-' + (last_id - 1)).removeClass('power-button-off').addClass('power-button-on');
+						$('#power-' + (last_id - 1)).removeClass('power-button-off')
+													.addClass('power-button-on')
+													.attr('title', opts.messages.enabled);
 						return false;
 					});
 					// Add a callback to the select language
@@ -595,8 +597,13 @@
 					
 					// Use ui-icon
 					if (active == 'locked') {
+						$('#power-' + last_id).attr('title', opts.messages.locked);
 						useUiIcon('#power-' + last_id,'ui-icon-locked');
+					} else if (active == 'false') {
+						$('#power-' + last_id).attr('title', opts.messages.disabled);
+						useUiIcon('#power-' + last_id,'ui-icon-power');
 					} else {
+						$('#power-' + last_id).attr('title', opts.messages.enabled);
 						useUiIcon('#power-' + last_id,'ui-icon-power');
 					}
 					
