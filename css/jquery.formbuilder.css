@@ -127,6 +127,8 @@ ul.frmb {
 	background: #FAA0A0 !important;
 }
 
+.power-button-locked { }
+
 .ol_opt_sortable {
 	padding: 0px;
 	list-style-type: none;

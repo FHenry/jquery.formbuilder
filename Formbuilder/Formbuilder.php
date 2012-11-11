@@ -165,7 +165,9 @@ class Formbuilder {
 
 			$form_language = $this->_form_array['form_language'];
 
-			foreach($this->_form_array['form_structure'] as $field){
+			foreach($this->_form_array['form_structure'] as $field) {
+
+				if ($field['active'] == 'false' || $field['active'] == 'locked') continue;
 
 				$field = (array) $field;
 
@@ -299,9 +301,10 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n",	$field['code'], $field_value);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
 			$html .= '</td></tr>' . "\n";
 		}
 		else
@@ -362,9 +365,10 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'],	$date);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'], $date, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_timestamp" name="'.$field['code'].'_timestamp" value="'.$timestamp.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
 		}
@@ -442,13 +446,14 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']]['title'].'</span></td><td'.$colspan.'>';
 			$html .= $form_language[$field['code']]['title_start'] . ' ';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_from',	$date_from);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_from', $date_from, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_from_timestamp" name="'.$field['code'].'_from_timestamp" value="'.$timestamp_from.'" />' . "\n"; // Use for timestamp format
 			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' ';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_to',	$date_to);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_to', $date_to, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
 		}
@@ -507,9 +512,10 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'],	$date);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'], $date, $disabled);
 			//$html .= '<input type="hidden" id="'.$field['code'].'_timestamp" name="'.$field['code'].'_timestamp" value="'.$timestamp.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
 		}
@@ -585,13 +591,14 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']]['title'].'</span></td><td'.$colspan.'>';
 			$html .= $form_language[$field['code']]['title_start'] . ' ';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_from',	$date_from);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_from', $date_from, $disabled);
 			//$html .= '<input type="hidden" id="'.$field['code'].'_from_timestamp" name="'.$field['code'].'_from_timestamp" value="'.$timestamp_from.'" />' . "\n"; // Use for timestamp format
 			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' ';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s" />' . "\n", $field['code'].'_to',	$date_to);
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_to',	$date_to, $disabled);
 			//$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
 		}
@@ -639,15 +646,20 @@ class Formbuilder {
 		else if ($view_type == 'table')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
+			$disabled = ($field['active'] == 'locked' ? true : false);
 
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
 
-			// Textarea or WYSIWYG Editor
-			if (! class_exists('DolEditor')) {
-				require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+			if ($disabled) {
+				$html .= ($enabled ? $field_value : dol_nl2br($field_value));
+			} else {
+				// Textarea or WYSIWYG Editor
+				if (! class_exists('DolEditor')) {
+					require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+				}
+				$doleditor = new DolEditor($field['code'], $field_value, '', 200, 'dolibarr_notes', '', false, true, $enabled, 8, 70);
+				$html .= $doleditor->Create(true);
 			}
-			$doleditor = new DolEditor($field['code'], $field_value, '', 200, 'dolibarr_notes', '', false, true, $enabled, 8, 70);
-			$html .= $doleditor->Create(true);
 
 			$html .= '</td></tr>' . "\n";
 		}
@@ -734,6 +746,8 @@ class Formbuilder {
 				if (! empty($field['align']) && $field['align'] == 'vertical')
 					$tag = 'div';
 
+				$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+
 				$html .= sprintf('<span class="multi-row clearfix">') . "\n";
 				foreach($field['values'] as $item){
 
@@ -750,8 +764,8 @@ class Formbuilder {
 					$checked = $checked ? ' checked="checked"' : '';
 					$item_value = $form_language[$field['code']]['values'][$item['id']];
 
-					$checkbox = '<'.$tag.' class="row clearfix"><input type="checkbox" id="%s_'.$item['id'].'" name="%1$s[]" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
-					$html .= sprintf($checkbox, $field['code'], $item['id'], $checked, $item_value);
+					$checkbox = '<'.$tag.' class="row clearfix"><input type="checkbox" id="%s_'.$item['id'].'" name="%1$s[]" value="%s"%s%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
+					$html .= sprintf($checkbox, $field['code'], $item['id'], $checked, $disabled, $item_value);
 				}
 				$html .= sprintf('</span>') . "\n";
 			}
@@ -841,6 +855,8 @@ class Formbuilder {
 				if (! empty($field['align']) && $field['align'] == 'vertical')
 					$tag = 'div';
 
+				$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+
 				$html .= sprintf('<span class="multi-row">') . "\n";
 				foreach($field['values'] as $item){
 
@@ -857,8 +873,8 @@ class Formbuilder {
 					// if checked, set html
 					$checked = ! empty($val) ? ' checked="checked"' : '';
 
-					$radio = '<'.$tag.' class="row clearfix"><input type="radio" id="%s_'.$item['id'].'" name="%1$s" value="%s"%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
-					$html .= sprintf($radio, $field['code'], $item['id'], $checked, $item_value);
+					$radio = '<'.$tag.' class="row clearfix"><input type="radio" id="%s_'.$item['id'].'" name="%1$s" value="%s"%s%s /> <label for="%1$s_'.$item['id'].'">%s</label></'.$tag.'>' . "\n";
+					$html .= sprintf($radio, $field['code'], $item['id'], $checked, $disabled, $item_value);
 				}
 				$html .= sprintf('</span>') . "\n";
 			}
@@ -959,8 +975,10 @@ class Formbuilder {
 
 				$id = $field['code'];
 				$multiple = ($field['multiple'] == "checked" ? ' multiple="multiple"' : '');
+				$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 				$name = (! empty($multiple) ? $field['code'].'[]' : $field['code']);
-				$html .= sprintf('<select class="flat" name="%s" id="%s"%s>' . "\n", $name, $id, $multiple);
+
+				$html .= sprintf('<select class="flat" name="%s" id="%s"%s%s>' . "\n", $name, $id, $multiple, $disabled);
 				$html .= (empty($multiple) ? '<option value=""></option>' . "\n" : ''); // Empty choice
 
 				foreach($field['values'] as $item){

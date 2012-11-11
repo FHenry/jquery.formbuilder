@@ -66,7 +66,8 @@
 				show				: "Show",
 				hide				: "Hide",
 				enabled				: "Enabled",
-				disabled			: "Disabled"
+				disabled			: "Disabled",
+				locked				: "Locked"
 			}
 		};
 		var opts = $.extend(defaults, options);
@@ -134,6 +135,9 @@
 						$('html, body').animate({
 							scrollTop: $('#frm-' + (last_id - 1) + '-item').offset().top
 						}, 500);
+						// Default element power button
+						useUiIcon('#power-' + (last_id - 1),'ui-icon-power');
+						$('#power-' + (last_id - 1)).removeClass('power-button-off').addClass('power-button-on');
 						return false;
 					});
 					// Add a callback to the select language
@@ -548,7 +552,9 @@
 						alignClass = ' frm-fld';
 					}
 					var powerClass = 'power-button-on';
-					if (active == 'false') {
+					if (active == 'locked') {
+						powerClass = 'power-button-locked';
+					} else if (active == 'false') {
 						powerClass = 'power-button-off';
 					}
 					var li = '';
@@ -586,14 +592,21 @@
 						opacity: 'show',
 						height: 'show'
 					}, 'slow');
-					last_id++;
+					
 					// Use ui-icon
-					useUiIcon('.power-button','ui-icon-power');
+					if (active == 'locked') {
+						useUiIcon('#power-' + last_id,'ui-icon-locked');
+					} else {
+						useUiIcon('#power-' + last_id,'ui-icon-power');
+					}
+					
 					useUiIcon('.del-button','ui-icon-trash');
 					useUiIcon('.toggle-form','ui-icon-triangle-1-n');
 					useUiIcon('.add','ui-icon-plus');
 					useUiIcon('.remove','ui-icon-trash');
 					useUiIcon('.move-button','ui-icon-triangle-2-n-s');
+					
+					last_id++;
 				};
 			// handle field display/hide
 			$('.toggle-form').live('click', function () {
@@ -625,13 +638,20 @@
 				}
 				return false;
 			});
-			// handle field on/off
+			// handle field on/off/locked
 			$('.power-button').live('click', function () {
 				if ($(this).hasClass('power-button-on')) {
+					useUiIcon(this,'ui-icon-locked');
 					$(this).removeClass('power-button-on')
+							.addClass('power-button-locked')
+							.attr('title', opts.messages.locked);
+				} else if ($(this).hasClass('power-button-locked')) {
+					useUiIcon(this,'ui-icon-power');
+					$(this).removeClass('power-button-locked')
 							.addClass('power-button-off')
 							.attr('title', opts.messages.disabled);
 				} else if ($(this).hasClass('power-button-off')) {
+					useUiIcon(this,'ui-icon-power');
 					$(this).removeClass('power-button-off')
 							.addClass('power-button-on')
 							.attr('title', opts.messages.enabled);
@@ -845,6 +865,8 @@
 						var powerbutton = $('#' + $(this).attr('id') + ' .power-button');
 						if (powerbutton.hasClass('power-button-on')) {
 							serialStr += opts.prepend + '[structure][' + li_count + '][active]=true';
+						} else if (powerbutton.hasClass('power-button-locked')) {
+							serialStr += opts.prepend + '[structure][' + li_count + '][active]=locked';
 						} else if (powerbutton.hasClass('power-button-off')) {
 							serialStr += opts.prepend + '[structure][' + li_count + '][active]=false';
 						}
