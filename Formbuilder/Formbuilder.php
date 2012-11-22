@@ -156,6 +156,8 @@ class Formbuilder {
 	public function process(){
 
 		global $langs;
+		
+		$langs->load('extrafields@extrafields');
 
 		$errors=array();
 		$results=array();
@@ -195,8 +197,8 @@ class Formbuilder {
 						$errors[] .= $langs->trans('ErrorFieldRequired', $form_language[$field['code']]) . '<br />' . "\n";
 
 					} else if (! is_numeric($val)) {
-
-						$errors[] .= $langs->trans('ErrorFieldMustBeNumeric', $form_language[$field['code']]) . '<br />' . "\n";
+						if (empty($val)) {$val=0;}
+						else {$errors[] .= $langs->trans('ErrorFieldMustBeNumeric', $form_language[$field['code']]) . '<br />' . "\n";}
 
 					} else {
 						$results[$field['code']] = $val;
