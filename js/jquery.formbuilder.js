@@ -24,6 +24,7 @@
 			select_language: false,
 			default_language: false,
 			default_form_language: false,
+			select_option_with_code: false,
 			messages: {
 				save				: "Save",
 				add_new_field		: "Add New Field...",
@@ -270,7 +271,7 @@
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" />';
 					help = '';
 					required = 'disabled';
-					appendFieldLi(opts.messages.comment_field, field, required, help, code, active);
+					appendFieldLi(opts.messages.comment_field, field, required, help, code, active, false, false);
 				};
 			// select single date
 			var appendSelectDate = function (values, required) {
@@ -284,7 +285,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_date, field, required, help, code, active);
+					appendFieldLi(opts.messages.select_date, field, required, help, code, active, false, false);
 				};
 			// select date range
 			var appendSelectDateRange = function (values, required) {
@@ -306,7 +307,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.date_end_label + '</label>';
 					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_date_range, field, required, help, code, active);
+					appendFieldLi(opts.messages.select_date_range, field, required, help, code, active, false, false);
 				};
 			// select single time
 			var appendSelectTime = function (values, required) {
@@ -320,7 +321,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_time, field, required, help, code, active);
+					appendFieldLi(opts.messages.select_time, field, required, help, code, active, false, false);
 				};
 			// select date range
 			var appendSelectTimeRange = function (values, required) {
@@ -342,7 +343,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.time_end_label + '</label>';
 					field += '<input class="fld-title" id="title-end-' + last_id + '" name="title-end" type="text" value="' + title_end + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.select_time_range, field, required, help, code, active);
+					appendFieldLi(opts.messages.select_time_range, field, required, help, code, active, false, false);
 				};
 			// single line input type="text"
 			var appendTextInput = function (values, required) {
@@ -356,7 +357,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.text, field, required, help, code, active);
+					appendFieldLi(opts.messages.text, field, required, help, code, active, false, false);
 				};
 			// multi-line textarea
 			var appendTextarea = function (values, required) {
@@ -386,7 +387,7 @@
 					field += '<div class="frm-fld"><label>' + opts.messages.label + '</label>';
 					field += '<input class="fld-title" id="title-' + last_id + '" type="text" value="' + title + '" /></div>';
 					help = '';
-					appendFieldLi(opts.messages.numeric, field, required, help, code, active);
+					appendFieldLi(opts.messages.numeric, field, required, help, code, active, false, false);
 				};
 			// adds a checkbox element
 			var appendCheckboxGroup = function (values, options, required) {
@@ -422,7 +423,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.checkbox_group, field, required, help, code, active, align);
+					appendFieldLi(opts.messages.checkbox_group, field, required, help, code, active, align, false);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -431,6 +432,9 @@
 					var checked = false;
 					var value = '';
 					var unique_id = unique_random();
+					
+					if (opts.select_option_with_code) {unique_id = '';}
+					
 					if (typeof (values) === 'object') {
 						unique_id = values[0];
 						value = values[1];
@@ -438,8 +442,16 @@
 					}
 					field = '<div>';
 					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
-					field += '<input type="text" value="' + value + '" />';
-					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
+					
+					if (opts.select_option_with_code) {
+						field += '<table>';
+						field += '<tr><td>' + opts.messages.code + '</td><td><input type="text" name="unique_id" value="' + unique_id + '" /></td></tr>';
+						field +=  '<tr><td>' + opts.messages.label + '</td><td><input type="text" value="' + value + '" /></td></tr>';
+						field += '</table>';
+					} else {
+						field += '<input type="text" value="' + value + '" />';
+						field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
+					}
 					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<span class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</span>';
 					field += '</div>';
@@ -481,7 +493,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.radio_group, field, required, help, code, active, align);
+					appendFieldLi(opts.messages.radio_group, field, required, help, code, active, align, false);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -490,16 +502,26 @@
 					var checked = false;
 					var value = '';
 					var unique_id = unique_random();
+					
+					if (opts.select_option_with_code) {unique_id = '';}
+					
 					if (typeof (values) === 'object') {
 						unique_id = values[0];
 						value = values[1];
 						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
 					field = '';
-					field += '<div>';
+					field += '<div class="align-bloc frm-fld">';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
-					field += '<input type="text" value="' + value + '" />';
-					field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
+					if (opts.select_option_with_code) {
+						field += '<table>';
+						field += '<tr><td>' + opts.messages.code + '</td><td><input type="text" name="unique_id" value="' + unique_id + '" /></td></tr>';
+						field +=  '<tr><td>' + opts.messages.label + '</td><td><input type="text" name="label_to_def" value="' + value + '" /></td></tr>';
+						field += '</table>';
+					} else {
+						field += '<input type="text" value="' + value + '" />';
+						field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
+					}
 					field += '<a href="#" class="remove delete-confirm-option" title="' + opts.messages.remove_message + '">' + opts.messages.remove + '</a>';
 					field += '<span class="move-button" title="' + opts.messages.move_message + '">' + opts.messages.move + '</span>';
 					field += '</div>';
@@ -547,7 +569,7 @@
 					field += '</div>';
 					field += '</div>';
 					help = '';
-					appendFieldLi(opts.messages.select, field, required, help, code, active, align);
+					appendFieldLi(opts.messages.select, field, required, help, code, active, align, false);
 					
 					$('.'+ opts.css_ol_sortable_class).sortable({ handle: '.move-button', opacity: 0.6, cursor: 'move' }); // making the dynamically added option fields sortable.
 				};
@@ -560,7 +582,8 @@
 				}
 			};
 			// Appends the new field markup to the editor
-			var appendFieldLi = function (title, field_html, required, help, code, active = true, align = false, wysiwyg = false) {
+			var appendFieldLi = function (title, field_html, required, help, code, active, align, wysiwyg) {
+					
 					var reg = new RegExp(opts.code_prefix, "gi");
 					if (required != 'disabled') {
 						required = (required === 'checked' ? true : false);
@@ -834,7 +857,8 @@
 						dataType: "json",
 						data: $(ul_obj).serializeFormList({
 							prepend: opts.serialize_prefix,
-							anchor: opts.code_prefix
+							anchor: opts.code_prefix,
+							select_option_with_code : opts.select_option_with_code
 						}),
 						success: function (r) {
 							if(r.error) {
@@ -872,7 +896,8 @@
 			anchor: 'options_',
 			prepend: 'ul',
 			is_child: false,
-			attributes: ['class']
+			attributes: ['class'],
+			select_option_with_code : false
 		};
 		var opts = $.extend(defaults, options);
 		if (!opts.is_child) {
@@ -1035,12 +1060,23 @@
 								else if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
-								else {
-									var keyid = $(this).next().val();
+								else if (($(this).attr('name') === 'unique_id') & (opts.select_option_with_code)) {
+									var keyid = $(this).val().replace(/"/g, "'");
+									var keyval =  $(this).context.parentElement.parentElement.parentElement.children[1].cells[1].childNodes[0].value;
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent(keyval);
 									c++;
+									
+								}
+								else {
+									if (!(opts.select_option_with_code)) {
+										var keyid = $(this).next.val();
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+										serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+										c++;
+									}
 								}
 							});
 							break;
