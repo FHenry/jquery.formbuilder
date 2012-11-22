@@ -156,8 +156,6 @@ class Formbuilder {
 	public function process(){
 
 		global $langs;
-		
-		$langs->load('extrafields@extrafields');
 
 		$errors=array();
 		$results=array();
