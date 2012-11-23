@@ -511,7 +511,7 @@
 						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
 					field = '';
-					field += '<div class="align-bloc frm-fld">';
+					field += '<div>';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					if (opts.select_option_with_code) {
 						field += '<table>';
@@ -834,12 +834,12 @@
 						text: false
 					});
 				}
-			}
+			};
 			// Generate random unique id
 			var unique_random = function () {
 				var ts = Math.round((new Date()).getTime() / 1000);
 				return Math.floor(Math.random()*ts);
-			}
+			};
 			// saves the serialized data to the server 
 			var save = function () {
 				var save_url = opts.save_url;
@@ -906,9 +906,10 @@
 		var serialStr = '';
 		// Begin the core plugin
 		this.each(function () {
-			var ul_obj = this;
+			//var ul_obj = this;
 			var li_count = 0;
 			var c = 0;
+			var att = 0;
 			$(this).children().each(function () {
 				for (att = 0; att < opts.attributes.length; att++) {
 					var key = (opts.attributes[att] === 'class' ? 'type' : opts.attributes[att]);

@@ -197,6 +197,7 @@ class Formbuilder {
 					} else if (! is_numeric($val)) {
 						if (empty($val)) {$val=0;}
 						else {$errors[] .= $langs->trans('ErrorFieldMustBeNumeric', $form_language[$field['code']]) . '<br />' . "\n";}
+						
 
 					} else {
 						$results[$field['code']] = $val;
