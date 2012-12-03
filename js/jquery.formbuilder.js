@@ -441,13 +441,10 @@
 						checked = ( values[2] === 'false' || values[2] === 'undefined' ) ? false : true;
 					}
 					field = '<div>';
-					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';
-					
+					field += '<input type="checkbox"' + (checked ? ' checked="checked"' : '') + ' />';					
 					if (opts.select_option_with_code) {
-						field += '<table>';
-						field += '<tr><td>' + opts.messages.code + '</td><td><input type="text" name="unique_id" value="' + unique_id + '" /></td></tr>';
-						field +=  '<tr><td>' + opts.messages.label + '</td><td><input type="text" value="' + value + '" /></td></tr>';
-						field += '</table>';
+						field += '<label class="code">' + opts.messages.code + '</label><input class="code" type="text" name="unique_id" value="' + unique_id + '" />';
+						field += '<label class="code">' + opts.messages.label + '</label><input type="text" name="label_value" value="' + value + '" />';
 					} else {
 						field += '<input type="text" value="' + value + '" />';
 						field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
@@ -503,8 +500,6 @@
 					var value = '';
 					var unique_id = unique_random();
 					
-					if (opts.select_option_with_code) {unique_id = '';}
-					
 					if (typeof (values) === 'object') {
 						unique_id = values[0];
 						value = values[1];
@@ -514,10 +509,8 @@
 					field += '<div>';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					if (opts.select_option_with_code) {
-						field += '<table>';
-						field += '<tr><td>' + opts.messages.code + '</td><td><input type="text" name="unique_id" value="' + unique_id + '" /></td></tr>';
-						field +=  '<tr><td>' + opts.messages.label + '</td><td><input type="text" name="label_to_def" value="' + value + '" /></td></tr>';
-						field += '</table>';
+						field += '<label class="code">' + opts.messages.code + '</label><input class="code radio-unique-id" type="text" name="unique_id" value="' + unique_id + '" disabled="disabled" />';
+						field += '<label class="code">' + opts.messages.label + '</label><input type="text" name="label_value" value="' + value + '" />';
 					} else {
 						field += '<input type="text" value="' + value + '" />';
 						field += '<input type="hidden" name="unique_id" value="' + unique_id + '" />';
@@ -786,6 +779,9 @@
 						$(this).after('<input type="checkbox">');
 						$(this).remove();
 					});
+					$(this).parent().find('.radio-unique-id').each(function() {
+						$(this).removeAttr('disabled');
+					});
 					$(this).parents('.frm-elements').find('.align-bloc').each(function() {
 						$(this).addClass('frm-fld').show();
 					});
@@ -795,6 +791,9 @@
 							$(this).after('<input type="radio">');
 							$(this).remove();
 						}
+					});
+					$(this).parent().find('.radio-unique-id').each(function() {
+						$(this).attr('disabled', 'disabled');
 					});
 					$(this).parents('.frm-elements').find('.align-bloc').each(function() {
 						$(this).removeClass('frm-fld').hide();
@@ -1020,6 +1019,16 @@
 								else if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
+								else if (opts.select_option_with_code) {
+									if ($(this).attr('name') === 'unique_id') {
+										var keyid = $(this).val().replace(/"/g, "'");
+										var keyval = $(this).next().next().val().replace(/"/g, "'"); // next() 2 times
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().prev().attr('checked'); // prev() 2 times
+										serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent(keyval);
+										c++;
+									}
+								}
 								else {
 									var keyid = $(this).next().val();
 									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
@@ -1038,6 +1047,16 @@
 								}
 								else if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+								}
+								else if (opts.select_option_with_code) {
+									if ($(this).attr('name') === 'unique_id') {
+										var keyid = $(this).val().replace(/"/g, "'");
+										var keyval = $(this).next().next().val().replace(/"/g, "'"); // next() 2 times
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().prev().attr('checked'); // prev() 2 times
+										serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent(keyval);
+										c++;
+									}
 								}
 								else {
 									var keyid = $(this).next().val();
@@ -1061,23 +1080,22 @@
 								else if ($(this).attr('name') === 'title') {
 									serialStr += opts.prepend + '[language][' + keycode + '][title]=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
 								}
-								else if (($(this).attr('name') === 'unique_id') & (opts.select_option_with_code)) {
-									var keyid = $(this).val().replace(/"/g, "'");
-									var keyval =  $(this).context.parentElement.parentElement.parentElement.children[1].cells[1].childNodes[0].value;
-									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
-									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent(keyval);
-									c++;
-									
-								}
-								else {
-									if (!(opts.select_option_with_code)) {
-										var keyid = $(this).next.val();
+								else if (opts.select_option_with_code) {
+									if ($(this).attr('name') === 'unique_id') {
+										var keyid = $(this).val().replace(/"/g, "'");
+										var keyval = $(this).next().next().val().replace(/"/g, "'"); // next() 2 times
 										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
-										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
-										serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+										serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().prev().attr('checked'); // prev() 2 times
+										serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent(keyval);
 										c++;
 									}
+								}
+								else {
+									var keyid = $(this).next().val();
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][id]=' + keyid;
+									serialStr += opts.prepend + '[structure][' + li_count + '][values][' + c + '][baseline]=' + $(this).prev().attr('checked');
+									serialStr += opts.prepend + '[language][' + keycode + '][values][' + keyid + ']=' + encodeURIComponent($(this).val().replace(/"/g, "'"));
+									c++;
 								}
 							});
 							break;

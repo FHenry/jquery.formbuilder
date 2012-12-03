@@ -41,6 +41,13 @@ ul.frmb {
 	line-height: 24px;
 }
 
+.frm-elements label.code {
+	width: 5%;
+	float: left;
+	margin-left: 5px;
+	line-height: 24px;
+}
+
 .frm-elements .false-label {
 	width: 20%;
 	float: left;
@@ -74,7 +81,11 @@ ul.frmb {
 }
 
 .frm-elements .fields input[type=text] {
-	width: 75%;
+	width: 55%;
+}
+
+.frm-elements .fields input[type=text].code {
+	width: 15%;
 }
 
 .frm-elements .fields label.auto {
