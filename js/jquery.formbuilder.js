@@ -509,7 +509,8 @@
 					field += '<div>';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					if (opts.select_option_with_code) {
-						field += '<label class="code">' + opts.messages.code + '</label><input class="code radio-unique-id" type="text" name="unique_id" value="' + unique_id + '" disabled="disabled" />';
+						unique_id='';
+						field += '<label class="code">' + opts.messages.code + '</label><input class="code radio-unique-id" type="text" name="unique_id" value="' + unique_id + '" />';
 						field += '<label class="code">' + opts.messages.label + '</label><input type="text" name="label_value" value="' + value + '" />';
 					} else {
 						field += '<input type="text" value="' + value + '" />';
