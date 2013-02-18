@@ -498,7 +498,10 @@
 			var radioFieldHtml = function (values, name) {
 					var checked = false;
 					var value = '';
-					var unique_id = unique_random();
+					var unique_id ='';
+					if (!opts.select_option_with_code) {
+						unique_id = unique_random();
+					} 
 					
 					if (typeof (values) === 'object') {
 						unique_id = values[0];
@@ -509,7 +512,6 @@
 					field += '<div>';
 					field += '<input type="radio"' + (checked ? ' checked="checked"' : '') + ' name="radio_' + name + '" />';
 					if (opts.select_option_with_code) {
-						unique_id='';
 						field += '<label class="code">' + opts.messages.code + '</label><input class="code radio-unique-id" type="text" name="unique_id" value="' + unique_id + '" />';
 						field += '<label class="code">' + opts.messages.label + '</label><input type="text" name="label_value" value="' + value + '" />';
 					} else {

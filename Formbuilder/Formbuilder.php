@@ -308,6 +308,8 @@ class Formbuilder {
 	 * @return string
 	 */
 	protected function loadInputText($field, $form_language, $view_type = false, $parameters = false){
+		
+		global $langs,$form;
 
 		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 
@@ -335,6 +337,16 @@ class Formbuilder {
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
 			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'query')
+		{
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+		
+			$html .= '<tr><td><span>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
+			$html .= '</td>';
+			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchTextHelp"),1,'help').'</td>';
+			$html .= '</tr>' . "\n";
 		}
 		else
 		{
@@ -357,6 +369,8 @@ class Formbuilder {
 	 * @return string
 	 */
 	protected function loadInputNumeric($field, $form_language, $view_type = false, $parameters = false){
+		
+		global $langs,$form;
 
 		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 
@@ -384,6 +398,16 @@ class Formbuilder {
 			$html .= '<tr><td><span'.$field['required'].'>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
 			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'query')
+		{
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+		
+			$html .= '<tr><td><span>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
+			$html .= '</td>';
+			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchIntHelp"),1,'help').'</td>';
+			$html .= '</tr>' . "\n";
 		}
 		else
 		{
@@ -407,7 +431,7 @@ class Formbuilder {
 	 */
 	protected function loadSelectDate($field, $form_language, $view_type = false, $parameters = false){
 
-		global $db, $conf, $langs;
+		global $db, $conf, $langs, $form;
 
 		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 		$timestamp = ($this->getDataValue($field['code'].'_timestamp') ? $this->getDataValue($field['code'].'_timestamp') : $this->getPostValue($field['code'].'_timestamp'));
@@ -449,7 +473,43 @@ class Formbuilder {
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'], $date, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_timestamp" name="'.$field['code'].'_timestamp" value="'.$timestamp.'" />' . "\n"; // Use for timestamp format
 			$html .= '</td></tr>' . "\n";
+		}else if ($view_type == 'query')
+		{
+			$html.= '<script type="text/javascript">';
+			$html.= '$(function() {
+					$( "#'.$field['code'].'_from" ).datepicker({
+						changeMonth: true,
+						numberOfMonths: 3,
+						altField: "#'.$field['code'].'_from_timestamp",
+						onClose: function( selectedDate ) {
+							$( "#'.$field['code'].'_to" ).datepicker( "option", "minDate", selectedDate );
+						}
+					});
+					$( "#'.$field['code'].'_to" ).datepicker({
+						changeMonth: true,
+						numberOfMonths: 3,
+						altField: "#'.$field['code'].'_to_timestamp",
+						onClose: function( selectedDate ) {
+							$( "#'.$field['code'].'_from" ).datepicker( "option", "maxDate", selectedDate );
+						}
+					});
+				});';
+			$html.= '</script>';
+			
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+			
+			$html .= '<tr><td><span>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= $langs->trans("AdvTgtStartDt") . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_from', $date_from, $disabled);
+			$html .= '<input type="hidden" id="'.$field['code'].'_from_timestamp" name="'.$field['code'].'_from_timestamp" value="'.$timestamp_from.'" />' . "\n"; // Use for timestamp format
+			$html .= '&nbsp;' . $langs->trans("AdvTgtEndDt") . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_to', $date_to, $disabled);
+			$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
+			$html .= '</td>';
+			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchDtHelp"),1,'help').'</td>';
+			$html .= '</tr>' . "\n";
 		}
+		
 		else
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' required' : false;
@@ -472,7 +532,7 @@ class Formbuilder {
 	 */
 	protected function loadSelectDateRange($field, $form_language, $view_type = false, $parameters = false){
 
-		global $db, $conf, $langs;
+		global $db, $conf, $langs,$form;
 
 		$field_value = ($this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']));
 		$timestamp_from = ($this->getDataValue($field['code'].'_from_timestamp') ? $this->getDataValue($field['code'].'_from_timestamp') : $this->getPostValue($field['code'].'_from_timestamp'));
@@ -521,7 +581,7 @@ class Formbuilder {
 			}
 			$html .= '</td></tr>' . "\n";
 		}
-		else if ($view_type == 'table')
+		else if ($view_type == 'table' || $view_type == 'query')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
@@ -701,6 +761,8 @@ class Formbuilder {
 	 * @return string
 	 */
 	protected function loadTextarea($field, $form_language, $view_type = false, $parameters = false){
+		
+		global $langs,$form;
 
 		$field_value = ( $this->getDataValue($field['code']) ? $this->getDataValue($field['code']) : $this->getPostValue($field['code']) );
 
@@ -740,6 +802,16 @@ class Formbuilder {
 			}
 
 			$html .= '</td></tr>' . "\n";
+		}
+		else if ($view_type == 'query')
+		{
+			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
+		
+			$html .= '<tr><td><span>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
+			$html .= '</td>';
+			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchTextHelp"),1,'help').'</td>';
+			$html .= '</tr>' . "\n";
 		}
 		else
 		{
@@ -799,7 +871,7 @@ class Formbuilder {
 
 			$html .= '</td></tr>' . "\n";
 		}
-		else if ($view_type == 'table')
+		else if ($view_type == 'table' || $view_type == 'query')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 
@@ -864,6 +936,7 @@ class Formbuilder {
 			$html.= '</script>';
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
+			if ($view_type == 'query') $html .= '</td><td></td></tr>' . "\n";
 			else $html .= '</li>' . "\n";
 		}
 
@@ -908,7 +981,7 @@ class Formbuilder {
 
 			$html .= '</td></tr>' . "\n";
 		}
-		else if ($view_type == 'table')
+		else if ($view_type == 'table' || $view_type == 'query')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 
@@ -973,6 +1046,7 @@ class Formbuilder {
 			$html.= '</script>';
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
+			if ($view_type == 'query') $html .= '</td><td></td></tr>' . "\n";
 			else $html .= '</li>' . "\n";
 		}
 
@@ -1030,7 +1104,7 @@ class Formbuilder {
 
 			$html .= '</td></tr>' . "\n";
 		}
-		else if ($view_type == 'table')
+		else if ($view_type == 'table' || $view_type == 'query')
 		{
 			$field['required'] = $field['required'] == 'checked' ? ' class="fieldrequired"' : '';
 
@@ -1109,6 +1183,7 @@ class Formbuilder {
 			}
 
 			if ($view_type == 'table') $html .= '</td></tr>' . "\n";
+			if ($view_type == 'query') $html .= '</td><td></td></tr>' . "\n";
 			else $html .= '</li>' . "\n";
 		}
 
