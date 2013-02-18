@@ -404,7 +404,10 @@ class Formbuilder {
 			$disabled = ($field['active'] == 'locked' ? ' disabled="disabled"' : '');
 		
 			$html .= '<tr><td><span>'.$form_language[$field['code']].'</span></td><td'.$colspan.'>';
-			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'], $field_value, $disabled);
+			$html .= $langs->trans("AdvTgtMinVal") . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'].'_min', $field_value, $disabled);
+			$html .= $langs->trans("AdvTgtMaxVal") . ' ';
+			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n",	$field['code'].'_max', $field_value, $disabled);
 			$html .= '</td>';
 			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchIntHelp"),1,'help').'</td>';
 			$html .= '</tr>' . "\n";
