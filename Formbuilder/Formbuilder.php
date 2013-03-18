@@ -50,6 +50,7 @@ class Formbuilder {
 			$form['form_language'] = json_decode($form['form_language'], true);
 			$form['form_data'] = json_decode($form['form_data'], true);
 			$this->_form_array = $form;
+			dol_syslog(get_class($this) . "::__construct form['form_data']=" . var_export($form['form_data'],true), LOG_DEBUG);
 		}
 		else if (array_key_exists('frmb', $form)){
 			$_form = array();
@@ -478,6 +479,11 @@ class Formbuilder {
 			$html .= '</td></tr>' . "\n";
 		}else if ($view_type == 'query')
 		{
+			$timestamp_from = ($this->getDataValue($field['code'].'_from_timestamp') ? $this->getDataValue($field['code'].'_from_timestamp') : $this->getPostValue($field['code'].'_from_timestamp'));
+			$timestamp_to = ($this->getDataValue($field['code'].'_to_timestamp') ? $this->getDataValue($field['code'].'_to_timestamp') : $this->getPostValue($field['code'].'_to_timestamp'));
+			$date_from = (! empty($timestamp_from) ? dol_print_date(($timestamp_from/1000), 'day') : '');
+			$date_to = (! empty($timestamp_to) ? dol_print_date(($timestamp_to/1000), 'day') : '');
+			
 			$html.= '<script type="text/javascript">';
 			$html.= '$(function() {
 					$( "#'.$field['code'].'_from" ).datepicker({
