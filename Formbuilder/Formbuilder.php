@@ -490,6 +490,7 @@ class Formbuilder {
 						changeMonth: true,
 						numberOfMonths: 3,
 						altField: "#'.$field['code'].'_from_timestamp",
+						clearText:\'Clear\',
 						onClose: function( selectedDate ) {
 							$( "#'.$field['code'].'_to" ).datepicker( "option", "minDate", selectedDate );
 						}
@@ -498,10 +499,17 @@ class Formbuilder {
 						changeMonth: true,
 						numberOfMonths: 3,
 						altField: "#'.$field['code'].'_to_timestamp",
+						clearText:\'Clear\',
 						onClose: function( selectedDate ) {
 							$( "#'.$field['code'].'_from" ).datepicker( "option", "maxDate", selectedDate );
 						}
 					});
+
+					$("#'.$field['code'].'_cleardt").click(function () {
+						$( "#'.$field['code'].'_from").datepicker(\'setDate\', null);
+						$( "#'.$field['code'].'_to").datepicker(\'setDate\', null);
+						});	
+					
 				});';
 			$html.= '</script>';
 			
@@ -514,7 +522,7 @@ class Formbuilder {
 			$html .= '&nbsp;' . $langs->trans("AdvTgtEndDt") . ' ';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_to', $date_to, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
-			$html .= '</td>';
+			$html .= '<input type="button" name="'.$field['code'].'_cleardt" id="'.$field['code'].'_cleardt" value="Clear" /></td>' . "\n";
 			$html .= '<td>'.$form->textwithpicto('',$langs->trans("AdvTgtSearchDtHelp"),1,'help').'</td>';
 			$html .= '</tr>' . "\n";
 		}
@@ -577,6 +585,10 @@ class Formbuilder {
 							$( "#'.$field['code'].'_from" ).datepicker( "option", "maxDate", selectedDate );
 						}
 					});
+					$("#'.$field['code'].'_cleardt").click(function () {
+						$( "#'.$field['code'].'_from").datepicker(\'setDate\', null);
+						$( "#'.$field['code'].'_to").datepicker(\'setDate\', null);
+					});	
 				});';
 		$html.= '</script>';
 
@@ -602,6 +614,7 @@ class Formbuilder {
 			$html .= '&nbsp;' . $form_language[$field['code']]['title_end'] . ' ';
 			$html .= sprintf('<input type="text" id="%s" name="%1$s" value="%s"%s />' . "\n", $field['code'].'_to', $date_to, $disabled);
 			$html .= '<input type="hidden" id="'.$field['code'].'_to_timestamp" name="'.$field['code'].'_to_timestamp" value="'.$timestamp_to.'" />' . "\n"; // Use for timestamp format
+			$html .= '<input type="button" name="'.$field['code'].'_cleardt" id="'.$field['code'].'_cleardt" value="Clear" /></td>' . "\n";
 			$html .= '</td></tr>' . "\n";
 		}
 		else
